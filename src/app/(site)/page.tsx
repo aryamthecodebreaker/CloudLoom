@@ -68,6 +68,7 @@ export default function LandingPage() {
     <>
       {/* ---------- Hero ---------- */}
       <section className="relative overflow-hidden bg-loom-navy text-white">
+        <GraphConstellation />
         <div className="grain absolute inset-0" aria-hidden />
         <div className="animate-orb absolute -top-40 left-[12%] h-[480px] w-[720px] rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(closest-side, #2C6BFF 0%, transparent)" }} aria-hidden />
         <div className="animate-orb absolute -bottom-52 right-[6%] h-[420px] w-[420px] rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(closest-side, #FF4F9A 0%, transparent)", animationDelay: "-6s" }} aria-hidden />
@@ -307,6 +308,39 @@ const heroSegments: Array<{ x1: number; y1: number; x2: number; y2: number }> = 
   { x1: 330, y1: 105, x2: 450, y2: 120 },
   { x1: 565, y1: 130, x2: 600, y2: 155 },
 ];
+
+function GraphConstellation() {
+  const pts: Array<[number, number, number]> = [
+    [90, 120, 0], [260, 60, 1.2], [420, 150, 2.4], [580, 70, 3.6], [760, 130, .8],
+    [930, 55, 2], [1090, 140, 3.2], [180, 300, 4.2], [350, 380, .4], [520, 320, 1.8],
+    [700, 400, 2.9], [880, 330, 4], [1040, 290, 1], [280, 560, 3.4], [480, 610, .6],
+    [660, 540, 1.6], [850, 600, 2.7], [1010, 520, 3.8],
+  ];
+  const links: Array<[number, number]> = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[0,7],[7,8],[8,9],[9,10],[10,11],[11,12],[8,13],[13,14],[14,15],[15,16],[16,17],[2,9],[4,11],[9,15],[10,16]];
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 h-full w-full opacity-40"
+      viewBox="0 0 1180 720"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      {links.map(([a, b], i) => (
+        <line key={i} x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]} stroke="#3E63C4" strokeWidth="1" opacity="0.35" />
+      ))}
+      {pts.map(([x, y, d], i) => (
+        <circle
+          key={i}
+          cx={x}
+          cy={y}
+          r={i % 5 === 0 ? 5 : 3}
+          fill={i % 4 === 0 ? "#FF4F9A" : "#7FA8FF"}
+          className="twinkle"
+          style={{ animationDelay: `${d}s` }}
+        />
+      ))}
+    </svg>
+  );
+}
 
 function HeroNode({ x, y, label, sub, color }: { x: number; y: number; label: string; sub: string; color: string }) {
   return (

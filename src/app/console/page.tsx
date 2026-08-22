@@ -1,17 +1,18 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { SEVERITY_STYLES, STATUS_STYLES, formatDate, parseAttackPath } from "@/lib/ui";
+import { EVENT_STYLES, SEVERITY_STYLES, STATUS_STYLES, formatDate, parseAttackPath } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 
 const SEV_ORDER = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"];
 
 export default async function SecurityDashboard() {
-  const [issues, accounts, resources, vulns] = await Promise.all([
+  const [issues, accounts, resources, vulns, events] = await Promise.all([
     db.issue.findMany({ include: { resource: true, control: true }, orderBy: { createdAt: "desc" } }),
     db.cloudAccount.findMany(),
     db.resource.count(),
     db.vulnerability.findMany(),
+    db.cloudEvent.findMany({ orderBy: { ts: "desc" }, take: 6 }),
   ]);
 
   const openIssues = issues.filter((i) => i.status === "OPEN");
@@ -123,6 +124,32 @@ export default async function SecurityDashboard() {
           })}
           {criticalPaths.length === 0 && (
             <li className="py-6 text-sm text-slate-500">No active attack paths. Nice.</li>
+          )}
+        </ul>
+      </section>
+
+      {/* Recent cloud activity */}
+      <section className="mt-8 rounded-2xl border border-loom-line bg-white p-6 shadow-card">
+        <div className="flex items-center justify-between">
+          <h2 className="font-bold text-loom-navy">Recent cloud activity</h2>
+          <span className="text-xs text-slate-400">simulated event stream</span>
+        </div>
+        <ul className="mt-4 divide-y divide-loom-line">
+          {events.map((ev) => (
+            <li key={ev.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3 text-sm">
+              <span className={`badge shrink-0 ${EVENT_STYLES[ev.result]}`}>{ev.result}</span>
+              <span className="min-w-0 flex-1">
+                <span className="font-mono text-xs text-slate-500">{ev.actor}</span>{" "}
+                <span className="text-slate-700">{ev.action}</span>
+              </span>
+              <span className="hidden shrink-0 rounded-md bg-loom-cloud px-2 py-0.5 text-[11px] font-medium text-slate-500 lg:inline-block">
+                {ev.source}
+              </span>
+              <span className="w-24 shrink-0 text-right text-xs text-slate-400">{formatDate(ev.ts)}</span>
+            </li>
+          ))}
+          {events.length === 0 && (
+            <li className="py-6 text-sm text-slate-500">No events recorded yet.</li>
           )}
         </ul>
       </section>

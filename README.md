@@ -10,9 +10,9 @@ would actually walk, and cut them at the source.
 
 `Next.js 14` · `TypeScript` · `Tailwind CSS` · `Prisma v5` · `Postgres`
 
-[**🚀 Live demo**](https://cloudloom-zeta.vercel.app/console) · [**⭐ Repository**](https://github.com/aryamthecodebreaker/CloudLoom) · [**📦 Quickstart**](#-quickstart) · [Contribute](#-contributing)
+[**🚀 Live demo**](https://trycloudloom.vercel.app/console) · [**⭐ Repository**](https://github.com/aryamthecodebreaker/CloudLoom) · [**📦 Quickstart**](#-quickstart) · [Contribute](#-contributing)
 
-[![Deployed on Vercel](https://img.shields.io/badge/live-cloudloom--zeta.vercel.app-2C6BFF)](https://cloudloom-zeta.vercel.app)
+[![Deployed on Vercel](https://img.shields.io/badge/live-cloudloom--zeta.vercel.app-2C6BFF)](https://trycloudloom.vercel.app)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green)](./LICENSE)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)
 
@@ -144,6 +144,11 @@ src/
 └── lib/
     ├── db.ts                 # Prisma client (dev-safe singleton)
     └── ui.ts                 # Severity/status styles, attack-path helpers
+agent/                       # Go engine room (roadmap #1): read-only cloud
+├── cmd/agent/main.go        #   connectors feeding the graph — see agent/README.md
+└── internal/
+    ├── provider/provider.go # Provider interface + Resource contract
+    └── aws/aws.go           # First connector target (stub + validation tests)
 prisma/
 ├── schema.prisma             # CloudAccount · Resource · Control · Issue ·
 │                             #   Vulnerability · ComplianceFramework

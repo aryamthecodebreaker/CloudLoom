@@ -6,6 +6,7 @@ import { Logo } from "./logo";
 
 const nav = [
   { href: "/console", label: "Security Dashboard", icon: "▦" },
+  { href: "/console/graph", label: "Graph Explorer", icon: "⌗" },
   { href: "/console/issues", label: "Issues", icon: "⚠" },
   { href: "/console/attack-paths", label: "Attack Paths", icon: "⇶" },
   { href: "/console/inventory", label: "Inventory", icon: "☰" },

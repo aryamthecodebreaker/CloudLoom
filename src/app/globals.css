@@ -70,6 +70,12 @@ body {
 .draw-path-2 { animation-delay: 1.4s; }
 .draw-path-3 { animation-delay: 2.8s; }
 
+@keyframes twinkle {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.85; }
+}
+.twinkle { animation: twinkle 5s ease-in-out infinite; }
+
 @keyframes pop-in {
   0% { opacity: 0; transform: translateY(8px) scale(0.96); }
   100% { opacity: 1; transform: translateY(0) scale(1); }

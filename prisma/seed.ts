@@ -9,6 +9,8 @@ function daysAgo(n: number) {
 }
 
 async function main() {
+  await db.cloudEvent.deleteMany();
+  await db.graphEdge.deleteMany();
   await db.issue.deleteMany();
   await db.vulnerability.deleteMany();
   await db.resource.deleteMany();
@@ -146,6 +148,51 @@ async function main() {
       },
     });
   }
+
+  // ---- Security graph edges (how risk travels) ----
+  const E = (from: string, kind: string, to: string) => ({ fromId: byName[from].id, kind, toId: byName[to].id });
+  const edges = [
+    E("prod-api-alb", "ROUTES_TO", "prod-api-asg"),
+    E("prod-api-alb", "ROUTES_TO", "checkout-service"),
+    E("prod-api-asg", "ACCESSES", "prod-payments-db"),
+    E("prod-api-asg", "ASSUMES", "prod-etl-role"),
+    E("edge-ingress-nginx", "ROUTES_TO", "staging-web-ecs"),
+    E("ci-runner-host", "ASSUMES", "prod-admin-role"),
+    E("ci-runner-host", "ACCESSES", "audit-log-bucket"),
+    E("prod-sgx-worker", "ASSUMES", "prod-etl-role"),
+    E("prod-sgx-worker", "EXPOSES", "prod-pii-bucket"),
+    E("prod-etl-role", "ACCESSES", "prod-pii-bucket"),
+    E("prod-etl-role", "DECRYPTS_WITH", "prod-events-kms"),
+    E("prod-lambda-authorizer", "ACCESSES", "prod-payments-db"),
+    E("prod-events-kms", "ENCRYPTS", "audit-log-bucket"),
+    E("corp-ad-vm", "ACCESSES", "hr-files-share"),
+    E("finance-sql", "ACCESSES", "hr-files-share"),
+    E("gpu-infer-pool", "ACCESSES", "model-weights-store"),
+    E("vertex-pipeline-sa", "ACCESSES", "model-weights-store"),
+    E("vertex-pipeline-sa", "ASSUMES", "gpu-infer-pool"),
+    E("pubsub-telemetry", "FEEDS", "prod-events-kms"),
+    E("staging-feature-store", "REPLICATES_FROM", "model-weights-store"),
+  ];
+  await db.graphEdge.createMany({ data: edges });
+
+  // ---- Simulated cloud activity feed ----
+  const h = (n: number) => new Date(Date.now() - n * 60 * 60 * 1000);
+  await db.cloudEvent.createMany({
+    data: [
+      { ts: h(0.4), actor: "deploy-bot@cloudloom", action: "Pushed image sha256:9f2c… to staging-web-ecs", target: "staging-web-ecs", result: "SUCCESS", source: "AWS CloudTrail" },
+      { ts: h(1.1), actor: "iam/user=ops-maria", action: "PutBucketAcl → public-read on prod-pii-bucket", target: "prod-pii-bucket", result: "SUSPICIOUS", source: "AWS CloudTrail" },
+      { ts: h(2.3), actor: "system/aws-config", action: "Recorded drift on sg-0af31c (22 added ingress)", target: "prod-sgx-worker", result: "SUCCESS", source: "AWS Config" },
+      { ts: h(3.7), actor: "unknown-ip 203.0.113.42", action: "Console sign-in without MFA as break-glass-admin", target: "prod-admin-role", result: "SUSPICIOUS", source: "AWS CloudTrail" },
+      { ts: h(5.2), actor: "sa/vertex-pipeline@ml-prod", action: "storage.objects.list on model-weights", target: "model-weights-store", result: "SUCCESS", source: "GCP Audit Logs" },
+      { ts: h(6.8), actor: "iam/user=etl-cron", action: "s3:GetObject ×14,204 on pii-exports prefix", target: "prod-pii-bucket", result: "SUCCESS", source: "AWS CloudTrail" },
+      { ts: h(9.4), actor: "azuread/service-principal/cicd", action: "Granted User Access Administrator — revoked by policy", target: "corp-ad-vm", result: "DENIED", source: "Azure Activity" },
+      { ts: h(12.1), actor: "k8s/node=edge-03", action: "HostPort binding detected outside daemonset spec", target: "edge-ingress-nginx", result: "SUCCESS", source: "Kubernetes Audit" },
+      { ts: h(15.9), actor: "iam/user=finance-reader", action: "sql.instances.export finance-prod → gs://tmp-export", target: "finance-sql", result: "SUCCESS", source: "GCP Audit Logs" },
+      { ts: h(20.5), actor: "github-actions[bot]", action: "Opened PR OWZPR-4471: bump ingress-nginx 1.9.6 → 1.11.5", target: "edge-ingress-nginx", result: "SUCCESS", source: "GitHub" },
+      { ts: h(26.2), actor: "root account", action: "Access key created for emergency use", target: "aws-production", result: "DENIED", source: "AWS CloudTrail" },
+      { ts: h(31.8), actor: "sa/vertex-pipeline@ml-prod", action: "iam.roles.assume on storage-admin (unused 90d)", target: "vertex-pipeline-sa", result: "SUSPICIOUS", source: "GCP Audit Logs" },
+    ],
+  });
 
   const vulnSeed: Array<[string, number, string, string, string, string, boolean, string]> = [
     ["CVE-2026-31142", 9.8, "CRITICAL", "libexpat", "2.5.0", "2.6.4", true, "Deserialization flaw in XML entity handling permits remote code execution in processes parsing untrusted input."],

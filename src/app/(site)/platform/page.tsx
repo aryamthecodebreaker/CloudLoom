@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "@/components/motion";
 import { GITHUB_URL } from "@/components/site-chrome";
+import { ArchitectureDiagram } from "@/components/architecture-diagram";
 
 export const metadata: Metadata = { title: "Platform" };
 
@@ -61,6 +62,20 @@ export default function PlatformPage() {
               </article>
             </Reveal>
           ))}
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="container-loom">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <h2 className="text-2xl font-extrabold tracking-tight text-loom-navy md:text-3xl">How the pieces fit</h2>
+            <p className="mt-3 text-slate-600">
+              One diagram, honestly labeled — solid lines run today, dashed lines are the roadmap.
+            </p>
+          </Reveal>
+          <Reveal delay={120} className="mt-10 overflow-hidden rounded-2xl border border-loom-line bg-white p-4 shadow-card sm:p-8">
+            <ArchitectureDiagram />
+          </Reveal>
         </div>
       </section>
 

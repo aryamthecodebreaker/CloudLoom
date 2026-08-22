@@ -21,6 +21,23 @@ export const PROVIDER_LABELS: Record<string, string> = {
   OCI: "🔶 OCI",
 };
 
+export const EVENT_STYLES: Record<string, string> = {
+  SUCCESS: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
+  DENIED: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+  SUSPICIOUS: "bg-red-50 text-red-600 ring-1 ring-red-200",
+};
+
+export const EDGE_COLORS: Record<string, string> = {
+  ROUTES_TO: "#94A3B8",
+  ACCESSES: "#2C6BFF",
+  ASSUMES: "#FF4F9A",
+  EXPOSES: "#F79009",
+  ENCRYPTS: "#12B76A",
+  DECRYPTS_WITH: "#12B76A",
+  FEEDS: "#7C3AED",
+  REPLICATES_FROM: "#7C3AED",
+};
+
 export type AttackHop = { label: string; sublabel: string; kind: string };
 
 export function parseAttackPath(json: string | null): AttackHop[] {
