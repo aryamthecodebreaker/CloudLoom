@@ -1,64 +1,61 @@
 import Link from "next/link";
 import { Logo } from "./logo";
+import { SiteNav } from "./site-nav";
+import { IconGitHub } from "./icons";
 
-const links = [
-  { href: "/platform", label: "Platform" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/console", label: "Live Demo Console" },
-];
-
-export function SiteNav() {
-  return (
-    <header className="sticky top-0 z-40 border-b border-loom-line bg-white/85 backdrop-blur">
-      <div className="container-loom flex h-16 items-center justify-between">
-        <Link href="/" aria-label="CloudLoom home"><Logo /></Link>
-        <nav className="hidden items-center gap-7 text-sm font-medium text-loom-ink md:flex">
-          {links.map((l) => (
-            <Link key={l.href} href={l.href} className="transition hover:text-loom-blue">
-              {l.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3">
-          <Link href="/console" className="btn-primary">Open console</Link>
-        </div>
-      </div>
-    </header>
-  );
-}
+export const GITHUB_URL = "https://github.com/aryamthecodebreaker/CloudLoom";
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-white/10 bg-loom-navy text-slate-300">
-      <div className="container-loom grid gap-10 py-14 md:grid-cols-4">
+      <div className="container-loom grid gap-10 py-14 md:grid-cols-3">
         <div className="space-y-4">
           <Logo dark />
           <p className="max-w-xs text-sm leading-relaxed text-slate-400">
-            The open-source cloud & AI security platform. Connect your stack,
-            see every attack path, fix what matters.
+            An open-source CNAPP blueprint. A working security-graph console woven
+            from a realistic simulated cloud — free forever, wired for what&apos;s next.
           </p>
-          <p className="text-xs text-slate-500">
-            Apache-2.0 · Built by the community
-          </p>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/50"
+          >
+            <IconGitHub className="h-4 w-4" /> Star on GitHub
+          </a>
         </div>
-        {[
-          { h: "Platform", items: ["Security Graph", "Attack Paths", "Code to Cloud", "Runtime Sensor"] },
-          { h: "Use cases", items: ["Vulnerability Management", "Cloud Posture", "Data Security", "AI Security"] },
-          { h: "Resources", items: ["Documentation", "Contribute", "Changelog", "Community Slack"] },
-        ].map((col) => (
-          <div key={col.h}>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">{col.h}</h3>
-            <ul className="space-y-2.5 text-sm">
-              {col.items.map((i) => (
-                <li key={i}><span className="cursor-pointer transition hover:text-white">{i}</span></li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div>
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Product</h3>
+          <ul className="space-y-2.5 text-sm">
+            <li><Link href="/console" className="transition hover:text-white">Security dashboard</Link></li>
+            <li><Link href="/console/issues" className="transition hover:text-white">Issues triage</Link></li>
+            <li><Link href="/console/attack-paths" className="transition hover:text-white">Attack paths</Link></li>
+            <li><Link href="/platform" className="transition hover:text-white">Platform overview</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Open source</h3>
+          <ul className="space-y-2.5 text-sm">
+            <li><a href={`${GITHUB_URL}`} target="_blank" rel="noopener noreferrer" className="transition hover:text-white">Repository</a></li>
+            <li><a href={`${GITHUB_URL}/blob/main/README.md`} target="_blank" rel="noopener noreferrer" className="transition hover:text-white">Quickstart guide</a></li>
+            <li><a href={`${GITHUB_URL}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer" className="transition hover:text-white">Apache-2.0 license</a></li>
+            <li><a href={`${GITHUB_URL}/issues`} target="_blank" rel="noopener noreferrer" className="transition hover:text-white">Report an issue</a></li>
+          </ul>
+        </div>
       </div>
       <div className="border-t border-white/10 py-5 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} CloudLoom contributors. Demo data only — no live cloud connections.
+        © {new Date().getFullYear()} CloudLoom contributors · Apache-2.0 · Demo environment runs on simulated data only — never connects to a real cloud account.
       </div>
     </footer>
+  );
+}
+
+export function SiteChrome({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-screen flex-col">
+      <SiteNav />
+      <main className="flex-1">{children}</main>
+      <SiteFooter />
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo, useState, useTransition } from "react";
+import { Fragment, useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { SEVERITY_STYLES, STATUS_STYLES } from "@/lib/ui";
 
@@ -22,6 +22,14 @@ export function IssuesClient({ initial }: { initial: Row[] }) {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Server data changes after router.refresh() (e.g. status updates) — stay in sync
+  // so re-sorted results appear without a full page reload.
+  const signature = useMemo(() => initial.map((r) => `${r.id}:${r.status}`).join(","), [initial]);
+  useEffect(() => {
+    setRows(initial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signature]);
 
   const filtered = useMemo(
     () =>

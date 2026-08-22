@@ -23,7 +23,7 @@ CloudLoom is a full-stack, self-contained demo of a modern CNAPP
 
 | Experience | What you get |
 |---|---|
-| 🌐 **Marketing site** (`/`) | Landing page, platform overview, and pricing — the public face |
+| 🌐 **Marketing site** (`/`) | Landing page and platform overview — the public face |
 | 🛡️ **Security console** (`/console`) | A working CNAPP dashboard backed by a real seeded database |
 
 ### The console includes
@@ -36,7 +36,31 @@ CloudLoom is a full-stack, self-contained demo of a modern CNAPP
 - **Compliance** — donut + heatmap views for CIS, SOC 2, ISO 27001, PCI DSS, HIPAA & GDPR posture
 - **Connectors** — cloud account connection status with scan freshness
 
-All demo data is generated and stored locally — **no real cloud accounts are ever connected**.
+All demo data is generated — **no real cloud accounts are ever connected**.
+
+## 🎯 Status: what CloudLoom is today
+
+CloudLoom is a **working blueprint**, not a production scanner. To be completely
+explicit about scope:
+
+**It does:**
+
+- Model a realistic multi-cloud estate (AWS, Azure, GCP, Kubernetes, OCI) as a queryable graph in Postgres
+- Evaluate controls into prioritized issues with real, persistent triage (`OPEN → IN_PROGRESS → RESOLVED / REJECTED`)
+- Visualize attack paths hop-by-hop with break-the-chain guidance
+- Render inventory, CVE knowledge-base, and compliance-posture views from those tables
+
+**It does not (yet):**
+
+- Connect to AWS/Azure/GCP or ingest live IAM/resources
+- Build attack graphs from live telemetry
+- Scan actual packages/CVEs in your workloads
+- Monitor runtime (no eBPF sensor)
+- Implement multi-tenancy/RBAC
+- Include the planned Red/Blue/Green security agents
+
+Everything in the second list is on the roadmap below — the schema is deliberately
+shaped so each lands without a rewrite.
 
 ## 🧠 The core idea: one graph, not ten thousand alerts
 
@@ -57,7 +81,7 @@ combine into a walkable path. That's what the console is built around.
 | Framework | Next.js 14 (App Router) | Server components read Prisma directly — zero API boilerplate for reads |
 | Language | TypeScript (strict) | Safety you can lean on |
 | Styling | Tailwind CSS | Fast, consistent design tokens |
-| Database | SQLite via **Prisma v5** | Zero-config local DB; swap `provider` for Postgres when you outgrow it |
+| Database | Any Postgres via **Prisma v5** | Free tiers from Supabase/Neon, or a local Docker Postgres |
 | Charts/Viz | Hand-rolled SVG | No chart-library bloat; fully deterministic renders |
 
 > Pure-JS dependencies only — no native build tools required on Windows/macOS/Linux.
@@ -70,10 +94,10 @@ git clone https://github.com/aryamthecodebreaker/CloudLoom.git
 cd CloudLoom
 npm install
 
-# 2. Configure env
+# 2. Configure env — point DATABASE_URL at any Postgres instance
 cp .env.example .env          # Windows: copy .env.example .env
 
-# 3. Create the database & seed realistic demo data
+# 3. Create the schema & seed realistic demo data
 npm run db:push
 npm run db:seed
 
@@ -82,7 +106,8 @@ npm run dev                   # marketing site at http://localhost:3000
                               # demo console at http://localhost:3000/console
 ```
 
-That's it — under 2 minutes from clone to a fully populated security console.
+Need an instant free Postgres? Create a project on [Supabase](https://supabase.com) or
+[Neon](https://neon.tech), copy the connection string into `DATABASE_URL`, done.
 
 ## 📜 Scripts
 
@@ -101,7 +126,7 @@ That's it — under 2 minutes from clone to a fully populated security console.
 ```
 src/
 ├── app/
-│   ├── (site)/               # Marketing pages: landing, platform, pricing
+│   ├── (site)/               # Marketing pages: landing, platform
 │   ├── console/              # CNAPP dashboard: overview, issues, attack paths,
 │   │                         #   inventory, vulnerabilities, compliance, connectors
 │   ├── api/issues/[id]/      # PATCH endpoint for issue status transitions
@@ -119,11 +144,16 @@ prisma/
 
 ## 🗺️ Roadmap
 
-- [ ] Security Graph explorer (interactive WQL-style query canvas)
-- [ ] AI agents: Red (attack simulation), Blue (auto-investigation), Green (fix PRs)
-- [ ] Runtime sensor event feed (simulated eBPF telemetry)
-- [ ] Postgres provider + multi-tenant projects/RBAC
-- [ ] Terraform / IaC scanning results view
+In build order — each lands against schema headroom that already exists:
+
+- [ ] Live cloud connectors: read-only AWS / Azure / GCP ingestion
+- [ ] Real IAM & resource graph from your actual estate
+- [ ] Telemetry-driven attack graphs (live network + identity edges)
+- [ ] Real CVE scanning of workloads and packages
+- [ ] Runtime monitoring via an eBPF sensor
+- [ ] Multi-tenancy, projects & RBAC
+- [ ] AI agents: Red (attack simulation), Blue (auto-investigation), Green (remediation PRs)
+- [ ] Security Graph explorer (interactive query canvas)
 
 Contributions welcome — grab anything above or surprise us.
 

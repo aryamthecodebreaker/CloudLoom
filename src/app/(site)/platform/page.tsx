@@ -1,84 +1,103 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Reveal } from "@/components/motion";
+import { GITHUB_URL } from "@/components/site-chrome";
 
 export const metadata: Metadata = { title: "Platform" };
 
 const pillars = [
   {
-    name: "Security Graph",
-    body: "Every resource, identity, network path, and vulnerability becomes a node with edges you can query. Complex relationships become one answer: what matters right now?",
+    name: "The graph model",
+    body: "Resources, identities, network paths, and findings are rows in Postgres with explicit relationships — the seed estate models five providers so every query has realistic structure to chew on.",
   },
   {
-    name: "Attack Path Analysis",
-    body: "Toxic combinations — public exposure plus a critical vuln plus access to sensitive data — are surfaced as single prioritized issues instead of three disconnected alerts.",
+    name: "Controls → issues pipeline",
+    body: "A control pairs a graph-shaped rule with a severity. When its conditions match modeled resources, an issue is raised and triaged through OPEN, IN_PROGRESS, RESOLVED, or REJECTED — persisted for real.",
   },
   {
-    name: "Agentless Visibility",
-    body: "Connect accounts read-only over API and get full inventory across VMs, containers, serverless, and AI services in minutes. No agents, no performance tax.",
+    name: "Attack path reasoning",
+    body: "Entry exposure, a exploitable finding, an identity hop, sensitive data: when the hops line up, they surface as one prioritized toxic combination instead of three disconnected alerts.",
   },
   {
-    name: "Code-to-Cloud Correlation",
-    body: "Running infrastructure maps back to the commit, pipeline, and team that shipped it, so remediation happens where the risk was born.",
-  },
-  {
-    name: "Runtime Sensor",
-    body: "An optional eBPF sensor adds real-time detection, workload blocking, reachability context that sharpens prioritization, and forensic capture when something goes wrong.",
-  },
-  {
-    name: "Democratized Security",
-    body: "Projects group resources by owning team, RBAC mirrors your org, and every engineer gets answers in plain language — security stops being a black box.",
+    name: "Honest reporting surfaces",
+    body: "Inventory, CVE knowledge-base views, and compliance posture dashboards compute from the same tables you can open and inspect. No magic numbers, no black boxes.",
   },
 ];
 
-const integrations = ["AWS", "Azure", "GCP", "Kubernetes", "OCI", "GitHub", "GitLab", "Slack", "Jira", "PagerDuty", "Terraform", "Datadog"];
+const designed = [
+  ["Live connectors", "Read-only ingestion across AWS, Azure, GCP, OCI & Kubernetes"],
+  ["Real telemetry", "Network, identity, and runtime edges feeding live attack graphs"],
+  ["Runtime sensor", "Optional eBPF signals for detection and blocking"],
+  ["Agentic layer", "Red (attack simulation) · Blue (investigation) · Green (remediation PRs)"],
+];
+
+const integrations = ["Postgres-ready", "Next.js 14", "TypeScript strict", "Tailwind tokens", "Prisma v5", "Deployable on Vercel", "Runs on any Node host"];
 
 export default function PlatformPage() {
   return (
     <>
       <section className="relative overflow-hidden bg-loom-navy py-24 text-white">
         <div className="grain absolute inset-0" aria-hidden />
-        <div
-          className="absolute -top-32 right-[15%] h-96 w-96 rounded-full opacity-30 blur-3xl"
-          style={{ background: "radial-gradient(closest-side, #FF4F9A 0%, transparent)" }}
-          aria-hidden
-        />
         <div className="container-loom relative max-w-3xl">
-          <span className="text-sm font-semibold uppercase tracking-widest text-sky-300">The CloudLoom platform</span>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">Your cloud &amp; AI security HQ</h1>
+          <span className="text-sm font-semibold uppercase tracking-widest text-sky-300">The CloudLoom blueprint</span>
+          <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">
+            A CNAPP&apos;s architecture, running for real
+          </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-300">
-            One graph-powered platform to discover everything running in your clouds,
-            understand which risks lead to real breaches, and fix them at the source —
-            built in the open, extensible by design.
+            CloudLoom implements the decision-making heart of a cloud security platform
+            — the graph, the controls, the attack-path logic — against a simulated
+            multi-cloud estate. The integration layer comes next.
           </p>
         </div>
       </section>
 
       <section className="py-24">
-        <div className="container-loom grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {pillars.map((p) => (
-            <article key={p.name} className="rounded-2xl border border-loom-line bg-white p-8 shadow-card transition hover:-translate-y-0.5 hover:border-loom-blue/40">
-              <h2 className="text-lg font-bold text-loom-navy">{p.name}</h2>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">{p.body}</p>
-            </article>
+        <div className="container-loom grid gap-6 sm:grid-cols-2">
+          {pillars.map((p, i) => (
+            <Reveal key={p.name} delay={i * 70}>
+              <article className="h-full rounded-2xl border border-loom-line bg-white p-8 shadow-card transition hover:-translate-y-0.5">
+                <h2 className="text-lg font-bold text-loom-navy">{p.name}</h2>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{p.body}</p>
+              </article>
+            </Reveal>
           ))}
         </div>
       </section>
 
-      <section className="border-y border-loom-line bg-loom-cloud py-16">
+      <section className="border-y border-loom-line bg-loom-cloud py-20">
+        <div className="container-loom grid gap-10 lg:grid-cols-2">
+          <div>
+            <h2 className="text-2xl font-extrabold tracking-tight text-loom-navy md:text-3xl">Designed, not yet built</h2>
+            <p className="mt-3 text-slate-600">
+              These exist as schema headroom and roadmap order — not as features. We say so because trust beats marketing.
+            </p>
+            <Link href="/console" className="btn-primary mt-7">See what IS built →</Link>
+          </div>
+          <ul className="space-y-3">
+            {designed.map(([t, d]) => (
+              <li key={t} className="rounded-xl border border-dashed border-loom-line bg-white px-5 py-4">
+                <p className="font-semibold text-loom-navy">{t}</p>
+                <p className="mt-0.5 text-sm text-slate-500">{d}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="py-20">
         <div className="container-loom text-center">
-          <h2 className="text-2xl font-extrabold text-loom-navy">Plays well with your stack</h2>
+          <h2 className="text-2xl font-extrabold text-loom-navy">Boring tech, on purpose</h2>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {integrations.map((i) => (
-              <span key={i} className="rounded-full border border-loom-line bg-white px-5 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-loom-blue hover:text-loom-blue">
+              <span key={i} className="rounded-full border border-loom-line bg-white px-5 py-2 text-sm font-semibold text-slate-600 shadow-sm">
                 {i}
               </span>
             ))}
           </div>
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="btn-secondary mt-10 inline-flex">
+            Inspect the schema on GitHub →
+          </a>
         </div>
-      </section>
-
-      <section className="py-20 text-center">
-        <Link href="/console" className="btn-primary px-8 py-3 text-base">See it on seeded data →</Link>
       </section>
     </>
   );

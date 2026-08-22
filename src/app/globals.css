@@ -30,3 +30,61 @@ body {
   background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
   background-size: 22px 22px;
 }
+
+/* ---------- motion ---------- */
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.animate-floaty { animation: floaty 6s ease-in-out infinite; }
+.animate-floaty-slow { animation: floaty 9s ease-in-out infinite; }
+
+@keyframes orb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.08); }
+  66% { transform: translate(-30px, 25px) scale(0.95); }
+}
+.animate-orb { animation: orb-drift 14s ease-in-out infinite; }
+
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee-x 32s linear infinite;
+}
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+@keyframes dash-draw {
+  to { stroke-dashoffset: 0; }
+}
+.draw-path {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: dash-draw 1.6s ease forwards;
+}
+.draw-path-2 { animation-delay: 1.4s; }
+.draw-path-3 { animation-delay: 2.8s; }
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.pop-in { opacity: 0; animation: pop-in 0.5s ease forwards; }
+.pop-1 { animation-delay: 0.2s; }
+.pop-2 { animation-delay: 1.5s; }
+.pop-3 { animation-delay: 2.9s; }
+.pop-4 { animation-delay: 4.1s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-floaty, .animate-floaty-slow, .animate-orb, .animate-marquee,
+  .draw-path, .pop-in {
+    animation: none;
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}

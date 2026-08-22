@@ -19,6 +19,10 @@ export default async function SecurityDashboard() {
   const kevCount = vulns.filter((v) => v.exploitedInWild).length;
   const bySeverity = Object.fromEntries(SEV_ORDER.map((s) => [s, openIssues.filter((i) => i.severity === s).length]));
   const maxSev = Math.max(1, ...Object.values(bySeverity));
+  const lastSync = accounts.reduce<Date | null>(
+    (latest, a) => (a.lastScanAt && (!latest || a.lastScanAt > latest) ? a.lastScanAt : latest),
+    null
+  );
 
   return (
     <div className="mx-auto max-w-6xl p-8">
@@ -26,9 +30,12 @@ export default async function SecurityDashboard() {
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-loom-navy">Security Dashboard</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Environment-wide risk at a glance · Last sync {formatDate(accounts[0]?.lastScanAt ?? null)}
+            Environment-wide risk at a glance · Last sync {formatDate(lastSync)}
           </p>
         </div>
+        <span className="badge bg-amber-100 px-3 py-1.5 text-amber-700" title="No live cloud connections — seeded simulation">
+          Simulated data
+        </span>
         <Link href="/console/issues" className="btn-secondary">View all issues →</Link>
       </header>
 

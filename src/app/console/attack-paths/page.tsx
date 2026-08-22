@@ -38,7 +38,7 @@ export default async function AttackPathsPage() {
             Toxic combinations ranked by exploitability — each hop is a place to break the chain.
           </p>
         </div>
-        <span className={`badge ${active.length > 0 ? SEVERITY_STYLES.CRITICAL : STATUS_STYLES.RESOLVED} px-3 py-1.5`}>
+        <span className={`badge px-3 py-1.5 ${active.length > 0 ? "bg-pink-100 text-pink-600" : "bg-emerald-100 text-emerald-700"}`}>
           {active.length} active
         </span>
       </header>

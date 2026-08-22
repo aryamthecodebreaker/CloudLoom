@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     template: "%s | CloudLoom",
   },
   description:
-    "Open-source CNAPP that connects code, cloud, and runtime into one security graph so teams can find real risk and fix it fast.",
+    "Open-source CNAPP blueprint: a working security-graph console running on a realistic simulated cloud. Free forever, live connectors on the roadmap.",
 };
 
 export default function RootLayout({

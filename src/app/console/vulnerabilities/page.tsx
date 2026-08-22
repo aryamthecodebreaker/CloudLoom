@@ -27,7 +27,7 @@ export default async function VulnerabilitiesPage() {
             Agentless scan results correlated with the graph — exploited-in-the-wild first.
           </p>
         </div>
-        <span className={`badge ${SEVERITY_STYLES.CRITICAL} px-3 py-1.5`}>
+        <span className="badge bg-red-100 px-3 py-1.5 text-red-700">
           {kev.length} CVEs exploited in the wild
         </span>
       </header>
