@@ -9,3 +9,5 @@ prisma/dev.db-journal
 .env.local
 
 .vercel
+
+_ids.tmp.ts
