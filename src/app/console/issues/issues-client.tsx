@@ -1,7 +1,8 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState, useTransition } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { SEVERITY_STYLES, STATUS_STYLES } from "@/lib/ui";
 
 type Row = {
@@ -14,14 +15,25 @@ type Row = {
 const SEV_ORDER = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"];
 const STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "REJECTED"];
 
-export function IssuesClient({ initial }: { initial: Row[] }) {
+export function IssuesClient({
+  initial,
+  initialRef = "",
+  initialStatus = "ALL",
+  initialSeverity = "ALL",
+}: {
+  initial: Row[];
+  initialRef?: string;
+  initialStatus?: string;
+  initialSeverity?: string;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [rows, setRows] = useState(initial);
-  const [sevFilter, setSevFilter] = useState("ALL");
-  const [statusFilter, setStatusFilter] = useState("ALL");
-  const [query, setQuery] = useState("");
+  const [sevFilter, setSevFilter] = useState(initialSeverity);
+  const [statusFilter, setStatusFilter] = useState(initialStatus);
+  const [query, setQuery] = useState(initialRef);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   // Server data changes after router.refresh() (e.g. status updates) — stay in sync
   // so re-sorted results appear without a full page reload.
@@ -30,6 +42,19 @@ export function IssuesClient({ initial }: { initial: Row[] }) {
     setRows(initial);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature]);
+
+  // Press "/" anywhere to jump to search (unless already typing in a field)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "/" || !searchRef.current) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+      e.preventDefault();
+      searchRef.current.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const filtered = useMemo(
     () =>
@@ -63,12 +88,16 @@ export function IssuesClient({ initial }: { initial: Row[] }) {
     <div className="mt-6">
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search issues, resources, projects…"
-          className="w-72 rounded-lg border border-loom-line bg-white px-4 py-2 text-sm outline-none focus:border-loom-blue"
-        />
+        <div className="relative">
+          <input
+            ref={searchRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search issues, resources, projects…"
+            className="w-72 rounded-lg border border-loom-line bg-white px-4 py-2 pr-8 text-sm outline-none focus:border-loom-blue"
+          />
+          <kbd className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-loom-line bg-loom-cloud px-1.5 text-[10px] font-semibold text-slate-400">/</kbd>
+        </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg border border-loom-line bg-white px-3 py-2 text-sm outline-none focus:border-loom-blue">
           <option value="ALL">All statuses</option>
           {STATUSES.map((s) => <option key={s} value={s}>{s.replace("_", " ")}</option>)}
@@ -103,10 +132,14 @@ export function IssuesClient({ initial }: { initial: Row[] }) {
                   className={`cursor-pointer align-top transition hover:bg-loom-cloud/60 ${expanded === r.id ? "bg-loom-sky/40" : ""}`}
                 >
                   <td className="max-w-md px-5 py-4">
-                    <p className="flex items-center gap-2 font-semibold text-loom-navy">
-                      {r.hasPath && <span title="Attack path" className="text-xs text-loom-pink">⇶</span>}
-                      {r.title}
-                    </p>
+                    <Link
+                      href={`/console/issues/${r.refId}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-start gap-2 font-semibold text-loom-navy hover:text-loom-blue"
+                    >
+                      {r.hasPath && <span title="Attack path" className="mt-0.5 text-xs text-loom-pink">⇶</span>}
+                      <span className="hover:underline">{r.title}</span>
+                    </Link>
                     <p className="mt-0.5 text-xs text-slate-400">{r.refId}</p>
                   </td>
                   <td className="px-4 py-4"><span className={`badge ${SEVERITY_STYLES[r.severity]}`}>{r.severity}</span></td>

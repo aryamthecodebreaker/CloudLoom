@@ -52,7 +52,7 @@ export default async function AttackPathsPage() {
                 <span className={`badge ${SEVERITY_STYLES[issue.severity]}`}>{issue.severity}</span>
                 <span className={`badge ${STATUS_STYLES[issue.status]}`}>{issue.status.replace("_", " ")}</span>
                 <h2 className="min-w-0 flex-1 truncate font-semibold text-loom-navy">{issue.title}</h2>
-                <Link href="/console/issues" className="text-xs font-semibold text-loom-blue hover:underline">
+                <Link href={`/console/issues?ref=${issue.refId}`} className="text-xs font-semibold text-loom-blue hover:underline">
                   Manage in issues →
                 </Link>
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { EDGE_COLORS, SEVERITY_STYLES, STATUS_STYLES } from "@/lib/ui";
 
@@ -92,6 +92,11 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
   const focusId = hoverId ?? selectedId;
   const isDimmed = (id: string) =>
     !!focusId && focusId !== id && !connections.get(focusId)?.has(id);
+
+  // If filters hide the selected node, drop the stale selection
+  useEffect(() => {
+    if (selectedId && !visible.has(selectedId)) setSelectedId(null);
+  }, [visible, selectedId]);
 
   const selected = selectedId ? nodes.find((n) => n.id === selectedId) ?? null : null;
 
