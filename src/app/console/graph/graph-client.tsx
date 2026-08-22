@@ -120,7 +120,7 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
               onClick={() => toggleProvider(p)}
               className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
                 activeProviders.has(p)
-                  ? "bg-loom-blue text-white shadow-sm"
+                  ? "bg-loom-accent text-white shadow-sm"
                   : "bg-white text-slate-400 ring-1 ring-loom-line hover:text-slate-600"
               }`}
             >
@@ -132,14 +132,14 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
               type="checkbox"
               checked={riskyOnly}
               onChange={(e) => setRiskyOnly(e.target.checked)}
-              className="h-3.5 w-3.5 accent-loom-blue"
+              className="h-3.5 w-3.5 accent-loom-accent"
             />
             Risky resources only
           </label>
         </div>
 
         {/* Canvas */}
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-loom-line bg-loom-navy p-4 shadow-card">
+        <div className="mt-4 overflow-x-auto rounded-2xl border border-loom-line bg-loom-coal p-4 shadow-card">
           <svg viewBox={`0 0 ${layout.width} ${layout.height}`} className="min-w-[900px]" role="img" aria-label="Interactive security graph of the seeded environment" onClick={() => setSelectedId(null)}>
             {edges.map((e, i) => {
               if (!visible.has(e.fromId) || !visible.has(e.toId)) return null;
@@ -217,17 +217,17 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
       </div>
 
       {/* Detail panel */}
-      <aside className={`rounded-2xl border p-6 ${selected ? "border-loom-blue/40 bg-white shadow-card" : "border-dashed border-loom-line bg-white/60"}`}>
+      <aside className={`rounded-2xl border p-6 ${selected ? "border-loom-accent/40 bg-white shadow-card" : "border-dashed border-loom-line bg-white/60"}`}>
         {selected ? (
           <>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="font-bold text-loom-navy">{selected.name}</h2>
+                <h2 className="font-bold text-loom-coal">{selected.name}</h2>
                 <p className="mt-0.5 text-xs text-slate-500">{selected.type} · {selected.provider}</p>
               </div>
-              <button onClick={() => setSelectedId(null)} aria-label="Close details" className="rounded-lg px-2 py-1 text-slate-400 transition hover:bg-loom-cloud hover:text-loom-navy">✕</button>
+              <button onClick={() => setSelectedId(null)} aria-label="Close details" className="rounded-lg px-2 py-1 text-slate-400 transition hover:bg-loom-cream hover:text-loom-coal">✕</button>
             </div>
-            <dl className="mt-4 space-y-1.5 rounded-xl bg-loom-cloud p-4 text-xs leading-relaxed">
+            <dl className="mt-4 space-y-1.5 rounded-xl bg-loom-cream p-4 text-xs leading-relaxed">
               <Row k="Account" v={selected.accountName} />
               <Row k="Region" v={selected.region} />
               <Row k="Project" v={selected.projectName} />
@@ -243,12 +243,12 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
             <ul className="mt-2 space-y-2">
               {selected.openIssues.map((i) => (
                 <li key={i.refId}>
-                  <Link href="/console/issues" className="block rounded-lg bg-loom-cloud px-3 py-2 transition hover:bg-loom-sky">
+                  <Link href="/console/issues" className="block rounded-lg bg-loom-cream px-3 py-2 transition hover:bg-loom-mist">
                     <span className="flex items-center gap-2">
                       <span className={`badge ${SEVERITY_STYLES[i.severity]}`}>{i.severity}</span>
                       <span className="font-mono text-[10px] text-slate-400">{i.refId}</span>
                     </span>
-                    <span className="mt-1 block text-xs font-medium leading-snug text-loom-navy">{i.title}</span>
+                    <span className="mt-1 block text-xs font-medium leading-snug text-loom-coal">{i.title}</span>
                     <span className={`mt-1 inline-block text-[10px] font-bold ${STATUS_STYLES[i.status].split(" ")[1]}`}>{i.status.replace("_", " ")}</span>
                   </Link>
                 </li>
@@ -264,7 +264,7 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
               <circle cx="12" cy="36" r="4" /><circle cx="38" cy="32" r="4" /><circle cx="24" cy="10" r="4" />
               <path d="M14.5 33l7-20M26.5 12l9 17M15.8 35.5l18-3" />
             </svg>
-            <p className="mt-4 text-sm font-semibold text-loom-navy">Select a node</p>
+            <p className="mt-4 text-sm font-semibold text-loom-coal">Select a node</p>
             <p className="mt-1 max-w-[220px] text-xs leading-relaxed text-slate-500">
               Click any resource in the graph — or just hover — to trace how it connects to the rest of your estate.
             </p>

@@ -4,59 +4,50 @@
 
 :root {
   color-scheme: light;
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 body {
-  @apply bg-white text-loom-ink antialiased;
+  @apply bg-paper text-ink font-sans antialiased;
 }
 
 .container-loom {
-  @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  @apply mx-auto max-w-6xl px-5 sm:px-8;
 }
 
+/* Buttons: two radii on purpose — controls get 6px, containers stay sharp */
 .btn-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-loom-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-loom-blue focus-visible:ring-offset-2;
+  @apply inline-flex items-center justify-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-colors duration-150 hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
 }
 
 .btn-secondary {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-loom-line bg-white px-5 py-2.5 text-sm font-semibold text-loom-ink transition hover:border-loom-blue hover:text-loom-blue;
+  @apply inline-flex items-center justify-center gap-2 rounded-md border border-ink/25 px-5 py-2.5 text-sm font-semibold text-ink transition-colors duration-150 hover:border-ink/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent;
 }
 
 .badge {
-  @apply inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
+  @apply inline-flex items-center rounded-[3px] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
 }
 
-.grain {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 22px 22px;
+.rule {
+  @apply border-t border-ink/10;
 }
 
-/* ---------- motion ---------- */
+.font-display {
+  font-optical-sizing: auto;
+}
 
-@keyframes floaty {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+kbd {
+  @apply rounded-[3px] border border-line bg-white px-1.5 py-0.5 font-mono text-[11px] text-ink-soft;
 }
-.animate-floaty { animation: floaty 6s ease-in-out infinite; }
-.animate-floaty-slow { animation: floaty 9s ease-in-out infinite; }
 
-@keyframes orb-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(40px, -30px) scale(1.08); }
-  66% { transform: translate(-30px, 25px) scale(0.95); }
-}
-.animate-orb { animation: orb-drift 14s ease-in-out infinite; }
+/* ---------- motion: varied by job, one easing family ---------- */
 
-@keyframes marquee-x {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+@keyframes clip-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
 }
-.animate-marquee {
-  animation: marquee-x 32s linear infinite;
-}
-.marquee-mask {
-  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+.clip-reveal {
+  animation: clip-reveal 0.9s var(--ease-out-quart) both;
 }
 
 @keyframes dash-draw {
@@ -65,32 +56,26 @@ body {
 .draw-path {
   stroke-dasharray: 600;
   stroke-dashoffset: 600;
-  animation: dash-draw 1.6s ease forwards;
+  animation: dash-draw 1.6s var(--ease-out-quart) forwards;
 }
-.draw-path-2 { animation-delay: 1.4s; }
-.draw-path-3 { animation-delay: 2.8s; }
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.12; }
-  50% { opacity: 0.85; }
-}
-.twinkle { animation: twinkle 5s ease-in-out infinite; }
+.draw-path-2 { animation-delay: 0.9s; }
+.draw-path-3 { animation-delay: 1.8s; }
 
 @keyframes pop-in {
-  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.pop-in { opacity: 0; animation: pop-in 0.5s ease forwards; }
-.pop-1 { animation-delay: 0.2s; }
-.pop-2 { animation-delay: 1.5s; }
-.pop-3 { animation-delay: 2.9s; }
-.pop-4 { animation-delay: 4.1s; }
+.pop-in { opacity: 0; animation: pop-in 0.45s var(--ease-out-quart) forwards; }
+.pop-1 { animation-delay: 0.15s; }
+.pop-2 { animation-delay: 1s; }
+.pop-3 { animation-delay: 1.85s; }
+.pop-4 { animation-delay: 2.7s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-floaty, .animate-floaty-slow, .animate-orb, .animate-marquee,
-  .draw-path, .pop-in {
+  .clip-reveal, .draw-path, .pop-in {
     animation: none;
     opacity: 1;
+    clip-path: none;
     stroke-dashoffset: 0;
   }
 }

@@ -29,7 +29,7 @@ export default async function IssueDetailPage({
 
   return (
     <div className="mx-auto max-w-4xl p-8">
-      <Link href="/console/issues" className="text-sm font-semibold text-loom-blue hover:underline">
+      <Link href="/console/issues" className="text-sm font-semibold text-loom-accent hover:underline">
         ← All issues
       </Link>
 
@@ -40,7 +40,7 @@ export default async function IssueDetailPage({
             <span className="font-mono text-xs text-slate-400">{issue.refId}</span>
             <span className="text-xs text-slate-400">· opened {formatDate(issue.createdAt)}</span>
           </div>
-          <h1 className="mt-2 text-xl font-extrabold leading-snug tracking-tight text-loom-navy">
+          <h1 className="mt-2 text-xl font-extrabold leading-snug tracking-tight text-loom-coal">
             {issue.title}
           </h1>
         </div>
@@ -55,8 +55,8 @@ export default async function IssueDetailPage({
         {/* Affected resource */}
         <section className="rounded-2xl border border-loom-line bg-white p-6 shadow-card">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Affected resource</h2>
-          <p className="mt-3 font-bold text-loom-navy">{issue.resource.name}</p>
-          <dl className="mt-3 space-y-1.5 rounded-xl bg-loom-cloud p-4 text-xs leading-relaxed">
+          <p className="mt-3 font-bold text-loom-coal">{issue.resource.name}</p>
+          <dl className="mt-3 space-y-1.5 rounded-xl bg-loom-cream p-4 text-xs leading-relaxed">
             <Row k="Type" v={issue.resource.type} />
             <Row k="Account" v={`${issue.resource.cloudAccount.provider} · ${issue.resource.cloudAccount.name}`} />
             <Row k="Region" v={issue.resource.region} />
@@ -69,7 +69,7 @@ export default async function IssueDetailPage({
               </div>
             )}
           </dl>
-          <Link href="/console/graph" className="mt-4 inline-block text-sm font-semibold text-loom-blue hover:underline">
+          <Link href="/console/graph" className="mt-4 inline-block text-sm font-semibold text-loom-accent hover:underline">
             View in Graph Explorer →
           </Link>
         </section>
@@ -77,11 +77,11 @@ export default async function IssueDetailPage({
         {/* Matched control */}
         <section className="rounded-2xl border border-loom-line bg-white p-6 shadow-card">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Matched control</h2>
-          <p className="mt-3 font-bold text-loom-navy">
+          <p className="mt-3 font-bold text-loom-coal">
             {issue.control.controlId} — {issue.control.name}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">{issue.control.description}</p>
-          <p className="mt-4 rounded-lg bg-loom-cloud px-3 py-2 font-mono text-[11px] leading-relaxed text-slate-600">
+          <p className="mt-4 rounded-lg bg-loom-cream px-3 py-2 font-mono text-[11px] leading-relaxed text-slate-600">
             {issue.control.queryHint}
           </p>
           <p className="mt-3 text-xs text-slate-400">Category: {issue.control.category}</p>
@@ -104,7 +104,7 @@ export default async function IssueDetailPage({
                     {idx + 1}
                   </span>
                   <div className="min-w-0 flex-1 rounded-xl border bg-white px-4 py-2.5" style={{ borderColor: `${KIND_COLORS[hop.kind] ?? "#2C6BFF"}55` }}>
-                    <p className="truncate text-sm font-semibold text-loom-navy">{hop.label}</p>
+                    <p className="truncate text-sm font-semibold text-loom-coal">{hop.label}</p>
                     <p className="mt-0.5 truncate text-xs text-slate-500">{hop.sublabel}</p>
                   </div>
                 </div>

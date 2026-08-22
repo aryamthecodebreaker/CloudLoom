@@ -53,7 +53,7 @@ export default async function IssuesPage({
     <div className="mx-auto max-w-6xl p-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-loom-navy">Issues</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-loom-coal">Issues</h1>
           <p className="mt-1 text-sm text-slate-500">
             Prioritized findings from controls evaluated against the security graph.
             Click a row for details · press <kbd className="rounded border border-loom-line bg-white px-1 text-[10px] font-semibold">/</kbd> to search · share views via URL.

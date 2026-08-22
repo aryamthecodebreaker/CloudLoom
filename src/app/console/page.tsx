@@ -29,7 +29,7 @@ export default async function SecurityDashboard() {
     <div className="mx-auto max-w-6xl p-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-loom-navy">Security Dashboard</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-loom-coal">Security Dashboard</h1>
           <p className="mt-1 text-sm text-slate-500">
             Environment-wide risk at a glance · Last sync {formatDate(lastSync)}
           </p>
@@ -51,12 +51,12 @@ export default async function SecurityDashboard() {
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
         {/* Open issues by severity */}
         <section className="rounded-2xl border border-loom-line bg-white p-6 shadow-card lg:col-span-3">
-          <h2 className="font-bold text-loom-navy">Open issues by severity</h2>
+          <h2 className="font-bold text-loom-coal">Open issues by severity</h2>
           <div className="mt-5 space-y-4">
             {SEV_ORDER.map((s) => (
               <div key={s} className="flex items-center gap-4">
                 <span className={`badge ${SEVERITY_STYLES[s]} w-28 justify-center`}>{s}</span>
-                <div className="h-6 flex-1 overflow-hidden rounded-md bg-loom-cloud">
+                <div className="h-6 flex-1 overflow-hidden rounded-md bg-loom-cream">
                   <div
                     className="h-full rounded-md transition-all"
                     style={{
@@ -65,23 +65,23 @@ export default async function SecurityDashboard() {
                     }}
                   />
                 </div>
-                <span className="w-8 text-right text-sm font-bold text-loom-navy">{bySeverity[s]}</span>
+                <span className="w-8 text-right text-sm font-bold text-loom-coal">{bySeverity[s]}</span>
               </div>
             ))}
           </div>
-          <Link href="/console/issues?status=OPEN" className="mt-6 inline-block text-sm font-semibold text-loom-blue hover:underline">
+          <Link href="/console/issues?status=OPEN" className="mt-6 inline-block text-sm font-semibold text-loom-accent hover:underline">
             Triage open issues →
           </Link>
         </section>
 
         {/* Connector health */}
         <section className="rounded-2xl border border-loom-line bg-white p-6 shadow-card lg:col-span-2">
-          <h2 className="font-bold text-loom-navy">Connector health</h2>
+          <h2 className="font-bold text-loom-coal">Connector health</h2>
           <ul className="mt-4 space-y-3">
             {accounts.map((a) => (
-              <li key={a.id} className="flex items-center justify-between rounded-lg bg-loom-cloud px-4 py-2.5 text-sm">
+              <li key={a.id} className="flex items-center justify-between rounded-lg bg-loom-cream px-4 py-2.5 text-sm">
                 <div>
-                  <span className="font-semibold text-loom-navy">{a.name}</span>
+                  <span className="font-semibold text-loom-coal">{a.name}</span>
                   <span className="ml-2 text-xs uppercase tracking-wide text-slate-400">{a.provider}</span>
                 </div>
                 <span className={`badge ${a.status === "CONNECTED" ? "bg-emerald-100 text-emerald-700" : a.status === "ERROR" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>
@@ -96,8 +96,8 @@ export default async function SecurityDashboard() {
       {/* Top attack paths */}
       <section className="mt-8 rounded-2xl border border-loom-line bg-white p-6 shadow-card">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-loom-navy">Top attack paths</h2>
-          <Link href="/console/attack-paths" className="text-sm font-semibold text-loom-blue hover:underline">All paths →</Link>
+          <h2 className="font-bold text-loom-coal">Top attack paths</h2>
+          <Link href="/console/attack-paths" className="text-sm font-semibold text-loom-accent hover:underline">All paths →</Link>
         </div>
         <ul className="mt-4 divide-y divide-loom-line">
           {criticalPaths.slice(0, 4).map((issue) => {
@@ -106,14 +106,14 @@ export default async function SecurityDashboard() {
               <li key={issue.id}>
                 <Link href="/console/attack-paths" className="group flex items-center gap-4 py-4">
                   <span className={`badge ${SEVERITY_STYLES[issue.severity]} shrink-0`}>{issue.severity}</span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-loom-navy group-hover:text-loom-blue">
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-loom-coal group-hover:text-loom-accent">
                     {issue.title}
                   </span>
                   <span className="hidden shrink-0 items-center gap-1 md:flex">
                     {hops.map((h, idx) => (
                       <span key={idx} className="inline-flex items-center gap-1">
                         {idx > 0 && <span className="text-xs text-loom-pink">→</span>}
-                        <span className="rounded-md bg-loom-sky px-2 py-1 text-[11px] font-medium text-loom-blue">{h.label}</span>
+                        <span className="rounded-md bg-loom-mist px-2 py-1 text-[11px] font-medium text-loom-accent">{h.label}</span>
                       </span>
                     ))}
                   </span>
@@ -131,7 +131,7 @@ export default async function SecurityDashboard() {
       {/* Recent cloud activity */}
       <section className="mt-8 rounded-2xl border border-loom-line bg-white p-6 shadow-card">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-loom-navy">Recent cloud activity</h2>
+          <h2 className="font-bold text-loom-coal">Recent cloud activity</h2>
           <span className="text-xs text-slate-400">simulated event stream</span>
         </div>
         <ul className="mt-4 divide-y divide-loom-line">
@@ -142,7 +142,7 @@ export default async function SecurityDashboard() {
                 <span className="font-mono text-xs text-slate-500">{ev.actor}</span>{" "}
                 <span className="text-slate-700">{ev.action}</span>
               </span>
-              <span className="hidden shrink-0 rounded-md bg-loom-cloud px-2 py-0.5 text-[11px] font-medium text-slate-500 lg:inline-block">
+              <span className="hidden shrink-0 rounded-md bg-loom-cream px-2 py-0.5 text-[11px] font-medium text-slate-500 lg:inline-block">
                 {ev.source}
               </span>
               <span className="w-24 shrink-0 text-right text-xs text-slate-400">{formatDate(ev.ts)}</span>

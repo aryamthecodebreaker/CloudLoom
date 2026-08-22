@@ -9,15 +9,15 @@ export const metadata: Metadata = { title: "Platform" };
 const pillars = [
   {
     name: "The graph model",
-    body: "Resources, identities, network paths, and findings are rows in Postgres with explicit relationships — the seed estate models five providers so every query has realistic structure to chew on.",
+    body: "Resources, identities, network paths, and findings are rows in Postgres with explicit relationships. The seed estate models five providers so every query has realistic structure to chew on.",
   },
   {
-    name: "Controls → issues pipeline",
+    name: "Controls → issues",
     body: "A control pairs a graph-shaped rule with a severity. When its conditions match modeled resources, an issue is raised and triaged through OPEN, IN_PROGRESS, RESOLVED, or REJECTED — persisted for real.",
   },
   {
-    name: "Attack path reasoning",
-    body: "Entry exposure, a exploitable finding, an identity hop, sensitive data: when the hops line up, they surface as one prioritized toxic combination instead of three disconnected alerts.",
+    name: "Attack-path reasoning",
+    body: "Entry exposure plus an exploitable finding plus an identity hop plus sensitive data: when the hops line up they surface as one prioritized toxic combination instead of three disconnected alerts.",
   },
   {
     name: "Honest reporting surfaces",
@@ -26,73 +26,68 @@ const pillars = [
 ];
 
 const designed = [
-  ["Live connectors", "Read-only ingestion across AWS, Azure, GCP, OCI & Kubernetes"],
+  ["Live connectors", "Read-only ingestion across AWS, Azure, GCP, OCI & Kubernetes via the Go agent"],
   ["Real telemetry", "Network, identity, and runtime edges feeding live attack graphs"],
   ["Runtime sensor", "Optional eBPF signals for detection and blocking"],
   ["Agentic layer", "Red (attack simulation) · Blue (investigation) · Green (remediation PRs)"],
 ];
 
-const integrations = ["Postgres-ready", "Next.js 14", "TypeScript strict", "Tailwind tokens", "Prisma v5", "Deployable on Vercel", "Runs on any Node host"];
-
 export default function PlatformPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-loom-navy py-24 text-white">
-        <div className="grain absolute inset-0" aria-hidden />
-        <div className="container-loom relative max-w-3xl">
-          <span className="text-sm font-semibold uppercase tracking-widest text-sky-300">The CloudLoom blueprint</span>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">
-            A CNAPP&apos;s architecture, running for real
-          </h1>
-          <p className="mt-6 text-lg leading-relaxed text-slate-300">
-            CloudLoom implements the decision-making heart of a cloud security platform
-            — the graph, the controls, the attack-path logic — against a simulated
-            multi-cloud estate. The integration layer comes next.
-          </p>
-        </div>
+      <section className="container-loom max-w-3xl pb-16 pt-20 md:pt-28">
+        <h1 className="font-display text-4xl font-medium leading-[1.08] tracking-tight text-ink md:text-5xl">
+          A CNAPP&apos;s architecture,
+          <br />
+          running for real.
+        </h1>
+        <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-soft">
+          CloudLoom implements the decision-making heart of a cloud security
+          platform — the graph, the controls, the attack-path logic — against a
+          simulated multi-cloud estate. The integration layer comes next.
+        </p>
       </section>
 
-      <section className="py-24">
-        <div className="container-loom grid gap-6 sm:grid-cols-2">
+      <div className="container-loom"><div className="rule" /></div>
+
+      <section className="container-loom grid gap-x-20 gap-y-2 py-16 lg:grid-cols-[3fr_7fr]">
+        <h2 className="font-display text-2xl font-medium tracking-tight text-ink lg:sticky lg:top-28 lg:self-start">
+          Four working parts.
+        </h2>
+        <div>
           {pillars.map((p, i) => (
-            <Reveal key={p.name} delay={i * 70}>
-              <article className="h-full rounded-2xl border border-loom-line bg-white p-8 shadow-card transition hover:-translate-y-0.5">
-                <h2 className="text-lg font-bold text-loom-navy">{p.name}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-slate-600">{p.body}</p>
+            <Reveal key={p.name} variant="left" delay={i * 50}>
+              <article className={`${i > 0 ? "rule" : ""} py-7 first:pt-0`}>
+                <h3 className="font-semibold text-ink">{p.name}</h3>
+                <p className="mt-2 max-w-[62ch] leading-relaxed text-ink-soft">{p.body}</p>
               </article>
             </Reveal>
           ))}
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container-loom">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-extrabold tracking-tight text-loom-navy md:text-3xl">How the pieces fit</h2>
-            <p className="mt-3 text-slate-600">
-              One diagram, honestly labeled — solid lines run today, dashed lines are the roadmap.
-            </p>
-          </Reveal>
-          <Reveal delay={120} className="mt-10 overflow-hidden rounded-2xl border border-loom-line bg-white p-4 shadow-card sm:p-8">
-            <ArchitectureDiagram />
-          </Reveal>
-        </div>
-      </section>
-
-      <section className="border-y border-loom-line bg-loom-cloud py-20">
-        <div className="container-loom grid gap-10 lg:grid-cols-2">
+      <section className="bg-coal py-20 text-paper">
+        <div className="container-loom grid gap-12 lg:grid-cols-[4fr_7fr] lg:gap-20">
           <div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-loom-navy md:text-3xl">Designed, not yet built</h2>
-            <p className="mt-3 text-slate-600">
-              These exist as schema headroom and roadmap order — not as features. We say so because trust beats marketing.
+            <h2 className="font-display text-2xl font-medium tracking-tight md:text-3xl">
+              Designed, not yet built.
+            </h2>
+            <p className="mt-4 leading-relaxed text-paper/70">
+              These exist as schema headroom and roadmap order — not features.
+              We say so because trust beats marketing.
             </p>
-            <Link href="/console" className="btn-primary mt-7">See what IS built →</Link>
+            <Link href="/console" className="mt-8 inline-flex items-center gap-2 rounded-md bg-paper px-5 py-2.5 text-sm font-semibold text-ink transition-colors duration-150 hover:bg-white">
+              See what IS built →
+            </Link>
           </div>
-          <ul className="space-y-3">
-            {designed.map(([t, d]) => (
-              <li key={t} className="rounded-xl border border-dashed border-loom-line bg-white px-5 py-4">
-                <p className="font-semibold text-loom-navy">{t}</p>
-                <p className="mt-0.5 text-sm text-slate-500">{d}</p>
+          <ul>
+            {designed.map(([t, d], i) => (
+              <li key={t} className={`${i > 0 ? "border-t border-white/10" : ""} flex items-baseline gap-5 py-4`}>
+                <span className="w-6 shrink-0 font-mono text-sm text-accent">→</span>
+                <div>
+                  <p className="font-semibold">{t}</p>
+                  <p className="mt-0.5 text-sm text-paper/55">{d}</p>
+                </div>
               </li>
             ))}
           </ul>
@@ -100,18 +95,28 @@ export default function PlatformPage() {
       </section>
 
       <section className="py-20">
-        <div className="container-loom text-center">
-          <h2 className="text-2xl font-extrabold text-loom-navy">Boring tech, on purpose</h2>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {integrations.map((i) => (
-              <span key={i} className="rounded-full border border-loom-line bg-white px-5 py-2 text-sm font-semibold text-slate-600 shadow-sm">
-                {i}
-              </span>
-            ))}
+        <div className="container-loom">
+          <Reveal>
+            <h2 className="max-w-md font-display text-2xl font-medium tracking-tight text-ink md:text-3xl">
+              How the pieces fit.
+            </h2>
+            <p className="mt-3 max-w-lg text-ink-soft">
+              One diagram, honestly labeled — solid lines run today, dashed lines are the roadmap.
+            </p>
+          </Reveal>
+          <Reveal delay={100} variant="fade" className="mt-10 rounded-md border border-line bg-white p-4 sm:p-8">
+            <ArchitectureDiagram />
+          </Reveal>
+          <div className="rule mt-16 pt-10">
+            <div className="flex flex-wrap items-baseline justify-between gap-6">
+              <p className="font-mono text-sm text-ink-faint">
+                Next.js 14 / TypeScript strict / Prisma v5 / Postgres / Tailwind / Go agent
+              </p>
+              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="btn-secondary">
+                Inspect the schema ↗
+              </a>
+            </div>
           </div>
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="btn-secondary mt-10 inline-flex">
-            Inspect the schema on GitHub →
-          </a>
         </div>
       </section>
     </>

@@ -19,7 +19,7 @@ export default async function ConnectorsPage() {
   return (
     <div className="mx-auto max-w-6xl p-8">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight text-loom-navy">Connectors</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-loom-coal">Connectors</h1>
         <p className="mt-1 text-sm text-slate-500">
           Agentless connections to your clouds. Read-only credentials, minutes to value.
         </p>
@@ -28,8 +28,8 @@ export default async function ConnectorsPage() {
       <ol className="mt-6 grid gap-4 md:grid-cols-3">
         {STEPS.map(([t, d], i) => (
           <li key={t} className="rounded-2xl border border-loom-line bg-white p-5 shadow-card">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-loom-blue/10 text-xs font-bold text-loom-blue">{i + 1}</span>
-            <p className="mt-3 font-semibold text-loom-navy">{t}</p>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-loom-accent/10 text-xs font-bold text-loom-accent">{i + 1}</span>
+            <p className="mt-3 font-semibold text-loom-coal">{t}</p>
             <p className="mt-1 text-xs leading-relaxed text-slate-500">{d}</p>
           </li>
         ))}
@@ -37,7 +37,7 @@ export default async function ConnectorsPage() {
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-loom-line bg-white shadow-card">
         <table className="w-full text-left text-sm">
-          <thead className="bg-loom-cloud text-xs uppercase tracking-wide text-slate-500">
+          <thead className="bg-loom-cream text-xs uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-5 py-3.5">Account</th>
               <th className="px-4 py-3.5">Provider</th>
@@ -49,8 +49,8 @@ export default async function ConnectorsPage() {
           </thead>
           <tbody className="divide-y divide-loom-line">
             {accounts.map((a) => (
-              <tr key={a.id} className="transition hover:bg-loom-cloud/60">
-                <td className="px-5 py-3.5 font-semibold text-loom-navy">{a.name}</td>
+              <tr key={a.id} className="transition hover:bg-loom-cream/60">
+                <td className="px-5 py-3.5 font-semibold text-loom-coal">{a.name}</td>
                 <td className="px-4 py-3.5 text-slate-600">{a.provider}</td>
                 <td className="hidden px-4 py-3.5 font-mono text-xs text-slate-500 md:table-cell">{a.externalId}</td>
                 <td className="px-4 py-3.5 text-slate-600">{a._count.resources}</td>

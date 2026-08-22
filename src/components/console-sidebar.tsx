@@ -18,7 +18,7 @@ const nav = [
 export function ConsoleSidebar() {
   const pathname = usePathname();
   return (
-    <aside className="flex h-screen w-16 shrink-0 flex-col border-r border-white/10 bg-loom-navy text-slate-300 lg:w-60">
+    <aside className="flex h-screen w-16 shrink-0 flex-col border-r border-white/10 bg-loom-coal text-slate-300 lg:w-60">
       <div className="border-b border-white/10 px-5 py-5">
         <Link href="/" aria-label="CloudLoom home"><Logo dark /></Link>
         <p className="mt-1 hidden text-[10px] uppercase tracking-[0.2em] text-slate-500 lg:block pl-8">Demo tenant</p>
@@ -32,7 +32,7 @@ export function ConsoleSidebar() {
               href={n.href}
               title={n.label}
               className={`flex items-center justify-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition lg:justify-start ${
-                active ? "bg-loom-blue text-white shadow-graph" : "hover:bg-white/5 hover:text-white"
+                active ? "bg-loom-accent text-white shadow-graph" : "hover:bg-white/5 hover:text-white"
               }`}
             >
               <span className="w-4 text-center opacity-80">{n.icon}</span>

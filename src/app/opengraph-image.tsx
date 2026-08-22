@@ -15,75 +15,48 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0A1633",
+          background: "#FAF6EE",
           padding: 72,
-          position: "relative",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: -160,
-            right: -120,
-            width: 560,
-            height: 560,
-            borderRadius: 999,
-            background: "radial-gradient(closest-side, rgba(44,107,255,.45), transparent)",
-            display: "flex",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -200,
-            left: -80,
-            width: 480,
-            height: 480,
-            borderRadius: 999,
-            background: "radial-gradient(closest-side, rgba(255,79,154,.3), transparent)",
-            display: "flex",
-          }}
-        />
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <div
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: 18,
-              background: "#2C6BFF",
+              width: 56,
+              height: 56,
+              borderRadius: 6,
+              background: "#211B12",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              flexDirection: "column",
-              gap: 6,
             }}
           >
-            <div style={{ display: "flex", gap: 10 }}>
-              <div style={{ width: 34, height: 4, background: "#B9D0FF", borderRadius: 4 }} />
-            </div>
-            <div style={{ display: "flex", gap: 14 }}>
-              <div style={{ width: 5, height: 30, background: "#FF4F9A", borderRadius: 4 }} />
-              <div style={{ width: 5, height: 30, background: "#FF4F9A", borderRadius: 4 }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+              <div style={{ width: 30, height: 3, background: "#F6F2EB", borderRadius: 2, opacity: 0.6 }} />
+              <div style={{ display: "flex", gap: 12 }}>
+                <div style={{ width: 4, height: 24, background: "#FF5CA8", borderRadius: 2 }} />
+                <div style={{ width: 4, height: 24, background: "#FF5CA8", borderRadius: 2 }} />
+              </div>
             </div>
           </div>
-          <div style={{ fontSize: 44, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
-            Cloud<span style={{ color: "#7FA8FF" }}>Loom</span>
-          </div>
+          <div style={{ fontSize: 40, fontWeight: 600, color: "#211B12" }}>CloudLoom</div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div style={{ fontSize: 62, fontWeight: 800, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
-            See your cloud the way an attacker would.
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <div style={{ fontSize: 64, lineHeight: 1.08, color: "#211B12", maxWidth: 900 }}>
+            Find the paths that actually reach your data.
           </div>
-          <div style={{ fontSize: 28, color: "#94A9CC" }}>
+          <div style={{ fontSize: 26, color: "#57503F" }}>
             Open-source security graph · attack paths · issue triage — free forever.
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 22, color: "#7E93BC" }}>
-          <span style={{ color: "#fff" }}>github.com/aryamthecodebreaker/CloudLoom</span>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 21, color: "#8C8371" }}>
+          <span style={{ color: "#D6246E", fontWeight: 700 }}>github.com/aryamthecodebreaker/CloudLoom</span>
           <span>·</span>
           <span>Apache-2.0</span>
           <span>·</span>
-          <span>Simulated-data demo</span>
+          <span>simulated-data demo</span>
         </div>
       </div>
     ),

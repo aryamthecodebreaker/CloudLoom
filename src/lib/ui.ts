@@ -8,7 +8,7 @@ export const SEVERITY_STYLES: Record<string, string> = {
 
 export const STATUS_STYLES: Record<string, string> = {
   OPEN: "bg-red-50 text-red-600 ring-1 ring-red-200",
-  IN_PROGRESS: "bg-blue-50 text-loom-blue ring-1 ring-blue-200",
+  IN_PROGRESS: "bg-blue-50 text-loom-accent ring-1 ring-blue-200",
   RESOLVED: "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200",
   REJECTED: "bg-slate-100 text-slate-500 ring-1 ring-slate-200",
 };

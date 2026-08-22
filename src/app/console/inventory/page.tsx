@@ -22,7 +22,7 @@ export default async function InventoryPage() {
   return (
     <div className="mx-auto max-w-6xl p-8">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight text-loom-navy">Inventory</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-loom-coal">Inventory</h1>
         <p className="mt-1 text-sm text-slate-500">
           Every discovered resource across your connected accounts — the nodes of the security graph.
         </p>
@@ -31,14 +31,14 @@ export default async function InventoryPage() {
       <div className="mt-6 flex flex-wrap gap-3">
         {Object.entries(byProvider).map(([p, n]) => (
           <span key={p} className="rounded-xl border border-loom-line bg-white px-4 py-2.5 text-sm font-semibold shadow-sm">
-            {PROVIDER_LABELS[p] ?? p} <span className="ml-1 text-loom-blue">{n}</span>
+            {PROVIDER_LABELS[p] ?? p} <span className="ml-1 text-loom-accent">{n}</span>
           </span>
         ))}
       </div>
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-loom-line bg-white shadow-card">
         <table className="w-full text-left text-sm">
-          <thead className="bg-loom-cloud text-xs uppercase tracking-wide text-slate-500">
+          <thead className="bg-loom-cream text-xs uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-5 py-3.5">Resource</th>
               <th className="px-4 py-3.5">Type</th>
@@ -50,9 +50,9 @@ export default async function InventoryPage() {
           </thead>
           <tbody className="divide-y divide-loom-line">
             {resources.map((r) => (
-              <tr key={r.id} className="transition hover:bg-loom-cloud/60">
+              <tr key={r.id} className="transition hover:bg-loom-cream/60">
                 <td className="px-5 py-3.5">
-                  <p className="font-semibold text-loom-navy">{r.name}</p>
+                  <p className="font-semibold text-loom-coal">{r.name}</p>
                   <p className="font-mono text-[10px] text-slate-400">{r.externalId}</p>
                 </td>
                 <td className="px-4 py-3.5 text-slate-600">{r.type}</td>
@@ -68,7 +68,7 @@ export default async function InventoryPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3.5">
-                  <span className={`font-semibold ${r._count.issues > 0 ? "text-loom-blue" : "text-slate-400"}`}>
+                  <span className={`font-semibold ${r._count.issues > 0 ? "text-loom-accent" : "text-slate-400"}`}>
                     {r._count.issues} issue{r._count.issues === 1 ? "" : "s"}
                   </span>
                   <span className="text-slate-300"> · </span>

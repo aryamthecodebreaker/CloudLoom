@@ -1,43 +1,47 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion";
-import { IconCode, IconGraph, IconShieldPulse, IconChipNodes } from "@/components/icons";
 import { GITHUB_URL } from "@/components/site-chrome";
 
 const shipped = [
   {
-    icon: IconGraph,
-    accent: "#2C6BFF",
-    title: "Security graph model",
-    body: "A seeded multi-cloud estate — resources, identities, and the relationships between them — queried like the real thing.",
+    title: "Security graph, drawn and queryable",
+    meta: "Postgres · 20 typed edges",
+    body: "A seeded multi-cloud estate — resources, identities, relationships — rendered as an interactive canvas. Columns are accounts; every edge is a way risk travels.",
   },
   {
-    icon: IconShieldPulse,
-    accent: "#FF4F9A",
-    title: "Issue triage that persists",
-    body: "Controls evaluate against the graph into prioritized issues. Change a status and it sticks — Postgres-backed, not props.",
+    title: "Triage that survives a refresh",
+    meta: "Controls → issues · persisted",
+    body: "Rules evaluate against the graph into prioritized issues. Move one through OPEN, IN_PROGRESS, RESOLVED or REJECTED and it stays moved — the database is the source of truth.",
   },
   {
-    icon: IconCode,
-    accent: "#7C3AED",
-    title: "Attack path visualization",
-    body: "Toxic combinations rendered hop by hop, entry point to sensitive data, with guidance on which single hop breaks the chain.",
+    title: "Attack paths, hop by hop",
+    meta: "Toxic combinations",
+    body: "Internet exposure plus a flaw plus an over-scoped role plus sensitive data is one walkable path. CloudLoom draws the hops and names the one that breaks the chain.",
   },
   {
-    icon: IconChipNodes,
-    accent: "#12B76A",
-    title: "Inventory, CVEs & compliance views",
-    body: "A resource catalog across five modeled providers, an exploited-in-the-wild CVE view, and framework posture with honest math.",
+    title: "The paperwork views",
+    meta: "Inventory · CVEs · compliance",
+    body: "Resource catalog across five modeled providers, exploited-in-the-wild CVE view, and framework posture computed from the same tables you can open yourself.",
   },
 ];
 
 const roadmap = [
-  ["Live cloud connectors", "Read-only AWS / Azure / GCP ingestion via API"],
-  ["Real IAM & resource graph", "Your actual estate, not the seed"],
-  ["Telemetry-driven attack graphs", "Live network and identity edges"],
-  ["CVE scanning", "Real package detection against workloads"],
-  ["Runtime monitoring", "eBPF sensor signals and alerting"],
+  ["Live cloud connectors", "Read-only AWS / Azure / GCP ingestion via the Go agent"],
+  ["Real IAM & resource graphs", "Your estate, not the seed"],
+  ["Telemetry-driven attack paths", "Live network and identity edges"],
+  ["CVE scanning", "Actual package detection against workloads"],
+  ["Runtime monitoring", "eBPF sensor signals"],
   ["Multi-tenancy & RBAC", "Teams, projects, scoped access"],
-  ["Red · Blue · Green agents", "Designed attack-simulation, investigation & remediation AI"],
+  ["Red · Blue · Green agents", "Simulation, investigation, remediation"],
+];
+
+const specs: Array<[string, string]> = [
+  ["License", "Apache-2.0 — every line yours"],
+  ["Stack", "Next.js 14 · TypeScript strict · Prisma v5"],
+  ["Database", "Any Postgres (Supabase-ready)"],
+  ["Demo estate", "22 resources · 5 providers · 20 edges"],
+  ["Connectors", "Go agent scaffolded — roadmap #1"],
+  ["Cost", "$0. No tier, no gate, no telemetry home."],
 ];
 
 const faqs = [
@@ -57,71 +61,91 @@ const faqs = [
     q: "Is it really 100% free?",
     a: "Yes. Apache-2.0 licensed, no gated features, no paid tier, no telemetry home. Clone it, run it anywhere Node runs, own every byte.",
   },
-  {
-    q: "Can I help build the real connectors?",
-    a: "Please do. The roadmap above is the build order, the schema is deliberately shaped for live ingestion, and good first issues are waiting in the repository.",
-  },
 ];
 
 export default function LandingPage() {
   return (
     <>
-      {/* ---------- Hero ---------- */}
-      <section className="relative overflow-hidden bg-loom-navy text-white">
-        <GraphConstellation />
-        <div className="grain absolute inset-0" aria-hidden />
-        <div className="animate-orb absolute -top-40 left-[12%] h-[480px] w-[720px] rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(closest-side, #2C6BFF 0%, transparent)" }} aria-hidden />
-        <div className="animate-orb absolute -bottom-52 right-[6%] h-[420px] w-[420px] rounded-full opacity-30 blur-3xl" style={{ background: "radial-gradient(closest-side, #FF4F9A 0%, transparent)", animationDelay: "-6s" }} aria-hidden />
-
-        <div className="container-loom relative pb-20 pt-24 text-center md:pt-32">
-          <span className="pop-in mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest backdrop-blur">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-            </span>
-            Open source · Apache-2.0 · 100% free
-          </span>
-          <h1 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight tracking-tight md:text-6xl md:leading-[1.06]">
-            See your cloud the way
+      {/* ---------- Hero: left-aligned, typographic, terminal beside it ---------- */}
+      <section className="container-loom grid items-start gap-12 pb-28 pt-20 lg:grid-cols-[11fr_9fr] lg:gap-16 lg:pt-28">
+        <div>
+          <h1 className="clip-reveal font-display text-5xl font-medium leading-[1.05] tracking-tight text-ink sm:text-6xl">
+            Find the paths that
             <br />
-            an attacker would.
+            actually reach your data.
           </h1>
-          <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-slate-300">
-            CloudLoom weaves resources, identities, and risks into one security graph.
-            Today it runs as a fully working console on a{" "}
-            <strong className="font-semibold text-white">realistic simulated environment</strong>{" "}
-            — built to explore, learn from, and extend toward live clouds.
+          <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-soft">
+            CloudLoom weaves resources, identities and findings into one security
+            graph, then shows which combinations an attacker could walk. Today it
+            runs as a fully working console on a realistic simulated cloud —
+            built to explore, learn from, and extend toward live clouds.
           </p>
-          <p className="mx-auto mt-4 max-w-2xl rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm leading-relaxed text-slate-300">
-            Honest scope: no live AWS/Azure/GCP connections yet — connectors are the top
-            roadmap item. Everything you see below is real software running on seed data.
-          </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Link href="/console" className="btn-primary px-8 py-3.5 text-base shadow-graph transition hover:-translate-y-0.5">
-              Explore the demo console →
+          <div className="mt-9 flex flex-wrap items-center gap-4">
+            <Link href="/console" className="btn-primary px-6 py-3 text-base">
+              Open the demo console
             </Link>
-            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="btn-secondary border-white/25 bg-transparent px-8 py-3.5 text-base text-white hover:border-white hover:text-white">
+            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="btn-secondary px-6 py-3 text-base">
               Read the code instead
             </a>
           </div>
+          <p className="mt-8 font-mono text-xs text-ink-faint">
+            Honest scope: no live AWS/Azure/GCP connections yet — connectors are roadmap item #1.
+          </p>
+        </div>
 
-          {/* Animated attack-path showcase */}
-          <Reveal delay={150} className="mx-auto mt-16 max-w-4xl">
-            <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-6 shadow-graph md:p-8">
-              <div className="grain absolute inset-0" aria-hidden />
-              <div className="relative mb-5 flex flex-wrap items-center justify-between gap-3 text-left">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">From the seeded graph</p>
-                  <p className="font-semibold text-white">Critical attack path · CL-1042</p>
+        {/* Real quickstart, styled like the terminal it runs in */}
+        <Reveal variant="fade" delay={120} className="lg:pt-6">
+          <div className="overflow-hidden rounded-md bg-coal shadow-card ring-1 ring-black/40">
+            <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5">
+              <span className="font-mono text-xs text-white/50">quickstart</span>
+              <span className="font-mono text-[10px] text-white/30">bash — 80×24</span>
+            </div>
+            <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-7 text-white/85"><code>{`$ git clone github.com/aryamthecodebreaker/CloudLoom
+$ cd CloudLoom && cp .env.example .env
+$ npm install
+
+$ npm run db:push && npm run db:seed   # schema + demo estate
+$ npm run dev
+
+`}<span className="text-emerald-400">✓ ready in under two minutes</span>{"\n"}<span className="text-white/45">→ http://localhost:3000/console</span></code></pre>
+          </div>
+          <p className="mt-3 font-mono text-xs text-ink-faint">No signup. No cloud credentials. Seeded data only.</p>
+        </Reveal>
+      </section>
+
+      <div className="container-loom"><div className="rule" /></div>
+
+      {/* ---------- Shipped: sticky intro + hairline list (no cards) ---------- */}
+      <section className="container-loom grid gap-12 py-24 lg:grid-cols-[4fr_7fr] lg:gap-20">
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <h2 className="font-display text-3xl font-medium tracking-tight text-ink md:text-4xl">
+            What ships today.
+          </h2>
+          <p className="mt-5 max-w-sm leading-relaxed text-ink-soft">
+            Four things, working right now in this repo. No vaporware list — each
+            one is backed by tables you can open and inspect.
+          </p>
+        </div>
+        <div>
+          {shipped.map((f, i) => (
+            <Reveal key={f.title} variant="left" delay={i * 60}>
+              <article className={`${i > 0 ? "rule" : ""} py-8 first:pt-0`}>
+                <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                  <h3 className="font-display text-xl font-medium text-ink">{f.title}</h3>
+                  <span className="font-mono text-xs text-accent">{f.meta}</span>
                 </div>
-                <span className="rounded-full bg-red-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-300 ring-1 ring-red-400/40">
-                  Entry → PII in 3 hops
-                </span>
-              </div>
-              <svg viewBox="0 0 680 190" className="relative w-full" role="img" aria-label="Animated attack path drawing itself from internet exposure to sensitive data">
+                <p className="mt-2.5 max-w-2xl leading-relaxed text-ink-soft">{f.body}</p>
+              </article>
+            </Reveal>
+          ))}
+
+          {/* The signature attack-path drawing, inline where it belongs */}
+          <div className="rule pt-8">
+            <div className="rounded-md border border-line bg-white/60 p-5">
+              <svg viewBox="0 0 680 150" className="w-full" role="img" aria-label="Attack path from internet exposure to sensitive data">
                 <defs>
-                  <marker id="hero-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M0,0 L10,5 L0,10 z" fill="#FF4F9A" />
+                  <marker id="path-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#D6246E" />
                   </marker>
                 </defs>
                 {heroSegments.map((s, i) => (
@@ -129,174 +153,106 @@ export default function LandingPage() {
                     key={i}
                     d={`M${s.x1},${s.y1} C${s.x1 + 55},${s.y1} ${s.x2 - 55},${s.y2} ${s.x2},${s.y2}`}
                     fill="none"
-                    stroke="#FF4F9A"
-                    strokeWidth="2.5"
-                    markerEnd="url(#hero-arrow)"
+                    stroke="#D6246E"
+                    strokeWidth="2"
+                    markerEnd="url(#path-arrow)"
                     className={`draw-path draw-path-${i + 1}`}
-                    style={{ strokeDasharray: "160", strokeDashoffset: "160" }}
                   />
                 ))}
-                <g className="pop-in pop-1"><HeroNode x={18} y={48} label="Internet" sub="0.0.0.0/0 : HTTPS" color="#F79009" /></g>
-                <g className="pop-in pop-2"><HeroNode x={196} y={72} label="edge-worker-01" sub="modeled RCE finding" color="#FF4F9A" /></g>
-                <g className="pop-in pop-3"><HeroNode x={428} y={98} label="etl-role" sub="over-scoped s3:*" color="#8FB3FF" /></g>
-                <g className="pop-in pop-4"><HeroNode x={566} y={132} label="pii-exports" sub="seeded PII store" color="#34D399" /></g>
+                <g className="pop-in pop-1"><PathNode x={18} y={44} label="Internet" sub="0.0.0.0/0" /></g>
+                <g className="pop-in pop-2"><PathNode x={196} y={66} label="edge-worker-01" sub="modeled RCE finding" /></g>
+                <g className="pop-in pop-3"><PathNode x={428} y={88} label="etl-role" sub="over-scoped s3:*" /></g>
+                <g className="pop-in pop-4"><PathNode x={560} y={112} label="pii-exports" sub="seeded PII store" tone /></g>
               </svg>
-              <div className="relative mt-4 grid grid-cols-2 gap-3 text-left sm:grid-cols-4">
-                {[
-                  ["Break hop 1", "close exposure", "#F79009"],
-                  ["Break hop 2", "patch the flaw", "#FF4F9A"],
-                  ["Break hop 3", "scope the role", "#8FB3FF"],
-                  ["…or shield", "the data directly", "#34D399"],
-                ].map(([t, s, c]) => (
-                  <div key={t} className="rounded-xl bg-white/5 px-3.5 py-2.5 ring-1 ring-white/10">
-                    <p className="text-xs font-bold" style={{ color: c }}>{t}</p>
-                    <p className="text-[11px] text-slate-400">{s}</p>
-                  </div>
-                ))}
-              </div>
+              <p className="mt-3 font-mono text-[11px] text-ink-faint">
+                CL-1042 · break any single hop and the path collapses — the console names which one to cut first.
+              </p>
             </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------- Shipped today ---------- */}
-      <section className="py-24">
-        <div className="container-loom">
-          <Reveal className="max-w-2xl">
-            <h2 className="text-3xl font-extrabold tracking-tight text-loom-navy md:text-4xl">
-              What actually ships today
-            </h2>
-            <p className="mt-4 text-lg leading-relaxed text-slate-600">
-              No vaporware list. These four things work right now, in this repo,
-              backed by Postgres you can inspect.
-            </p>
-          </Reveal>
-          <div className="mt-14 grid gap-6 sm:grid-cols-2">
-            {shipped.map((f, i) => (
-              <Reveal key={f.title} delay={i * 80}>
-                <article className="flex h-full gap-5 rounded-2xl border border-loom-line bg-white p-7 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-lg">
-                  <span
-                    className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-                    style={{ background: `${f.accent}14`, color: f.accent }}
-                  >
-                    <f.icon className="h-6 w-6" />
-                  </span>
-                  <div>
-                    <h3 className="text-lg font-bold text-loom-navy">{f.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{f.body}</p>
-                  </div>
-                </article>
-              </Reveal>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* ---------- Roadmap ---------- */}
-      <section className="relative overflow-hidden bg-loom-navy py-24 text-white">
-        <div className="grain absolute inset-0" aria-hidden />
-        <div className="container-loom relative grid gap-12 lg:grid-cols-5">
-          <Reveal className="lg:col-span-2">
-            <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
-              The road to live clouds
+      {/* ---------- Roadmap on dark ---------- */}
+      <section className="bg-coal py-24 text-paper">
+        <div className="container-loom grid gap-12 lg:grid-cols-[4fr_7fr] lg:gap-20">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <h2 className="font-display text-3xl font-medium tracking-tight md:text-4xl">
+              Then the road to live clouds.
             </h2>
-            <p className="mt-4 text-lg leading-relaxed text-slate-300">
-              We won&apos;t pretend the rest exists. Here is exactly what&apos;s next,
-              in build order — each step plugs into a schema that&apos;s already
-              shaped for it.
+            <p className="mt-5 max-w-sm leading-relaxed text-paper/70">
+              We won&apos;t pretend the rest exists. This is the build order —
+              each step lands against schema headroom that already exists.
             </p>
-            <a
-              href={`${GITHUB_URL}/issues`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-8 inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-loom-blue transition hover:-translate-y-0.5"
-            >
-              Claim an issue on GitHub →
+            <a href={`${GITHUB_URL}/issues`} target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex items-center gap-2 rounded-md bg-paper px-5 py-2.5 text-sm font-semibold text-ink transition-colors duration-150 hover:bg-white">
+              Claim an issue →
             </a>
-          </Reveal>
-          <ol className="space-y-3 lg:col-span-3">
+          </div>
+          <ol>
             {roadmap.map(([title, detail], i) => (
-              <Reveal key={title} delay={i * 60}>
-                <li className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                  <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-loom-blue/20 text-xs font-bold text-sky-300">
-                    {i + 1}
-                  </span>
-                  <div>
-                    <p className="font-semibold text-white">{title}</p>
-                    <p className="mt-0.5 text-sm text-slate-400">{detail}</p>
-                  </div>
-                  <span className="ml-auto hidden shrink-0 self-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 ring-1 ring-white/15 sm:inline-block">
-                    Planned
-                  </span>
-                </li>
-              </Reveal>
+              <li key={title} className={`${i > 0 ? "border-t border-white/10" : ""} flex items-baseline gap-6 py-5`}>
+                <span className="w-8 shrink-0 font-mono text-sm text-accent">{String(i + 1).padStart(2, "0")}</span>
+                <div>
+                  <p className="font-semibold">{title}</p>
+                  <p className="mt-0.5 text-sm text-paper/55">{detail}</p>
+                </div>
+              </li>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* ---------- Fact strip ---------- */}
-      <section className="border-b border-loom-line bg-loom-cloud py-10">
-        <div className="container-loom grid grid-cols-2 gap-6 text-center lg:grid-cols-4">
-          {[
-            ["100%", "free & open source"],
-            ["Apache-2.0", "every line yours"],
-            ["5 clouds", "modeled in the demo graph"],
-            ["< 2 min", "clone to running console"],
-          ].map(([v, l]) => (
-            <div key={l}>
-              <p className="text-2xl font-extrabold text-loom-navy">{v}</p>
-              <p className="mt-1 text-sm text-slate-500">{l}</p>
-            </div>
-          ))}
+      {/* ---------- Spec sheet, not a stat banner ---------- */}
+      <section className="bg-cream py-20">
+        <div className="container-loom grid gap-10 lg:grid-cols-[4fr_7fr] lg:gap-20">
+          <h2 className="font-display text-3xl font-medium tracking-tight text-ink">
+            The datasheet.
+          </h2>
+          <dl className="divide-y divide-ink/10 border-y border-ink/10">
+            {specs.map(([k, v]) => (
+              <div key={k} className="grid gap-1 py-4 sm:grid-cols-[160px_1fr] sm:gap-6">
+                <dt className="font-mono text-xs uppercase tracking-wider text-ink-faint">{k}</dt>
+                <dd className="font-medium text-ink">{v}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
       {/* ---------- FAQ ---------- */}
       <section className="py-24">
-        <div className="container-loom mx-auto max-w-3xl">
-          <Reveal>
-            <h2 className="text-center text-3xl font-extrabold tracking-tight text-loom-navy md:text-4xl">
-              The uncomfortable questions
-            </h2>
-          </Reveal>
-          <div className="mt-12 space-y-4">
-            {faqs.map((f, i) => (
-              <Reveal key={f.q} delay={i * 60}>
-                <details className="group rounded-2xl border border-loom-line bg-white px-6 py-5 shadow-card transition open:border-loom-blue/40 [&_summary::-webkit-details-marker]:hidden">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-semibold text-loom-navy">
-                    {f.q}
-                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-loom-cloud text-loom-blue transition-transform duration-300 group-open:rotate-45">+</span>
-                  </summary>
-                  <p className="mt-4 text-sm leading-relaxed text-slate-600">{f.a}</p>
-                </details>
-              </Reveal>
+        <div className="container-loom max-w-3xl">
+          <h2 className="font-display text-3xl font-medium tracking-tight text-ink">
+            The uncomfortable questions.
+          </h2>
+          <div className="mt-10 divide-y divide-ink/10 border-y border-ink/10">
+            {faqs.map((f) => (
+              <details key={f.q} className="group py-5 [&_summary::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-left font-semibold text-ink">
+                  {f.q}
+                  <span className="font-mono text-lg text-accent transition-transform duration-200 group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-3 max-w-[65ch] leading-relaxed text-ink-soft">{f.a}</p>
+              </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ---------- CTA ---------- */}
-      <section className="pb-24">
-        <div className="container-loom">
-          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-loom-blue to-loom-navy px-8 py-16 text-center text-white shadow-graph md:py-20">
-            <div className="grain absolute inset-0" aria-hidden />
-            <h2 className="relative text-3xl font-extrabold tracking-tight md:text-4xl">
-              Walk the graph yourself
+      {/* ---------- CTA: solid dark, one button ---------- */}
+      <section className="bg-coal py-24 text-paper">
+        <div className="container-loom flex flex-wrap items-end justify-between gap-10">
+          <div className="max-w-xl">
+            <h2 className="font-display text-3xl font-medium tracking-tight md:text-4xl">
+              Walk the graph yourself.
             </h2>
-            <p className="relative mx-auto mt-3 max-w-xl text-lg text-sky-100">
+            <p className="mt-4 max-w-md leading-relaxed text-paper/70">
               A fully seeded environment is waiting — attack paths, triage,
-              compliance, and all. No signup, no credentials, no risk.
+              compliance. No signup, no credentials, no risk.
             </p>
-            <div className="relative mt-8 flex flex-wrap justify-center gap-4">
-              <Link href="/console" className="rounded-lg bg-white px-8 py-3.5 text-base font-semibold text-loom-blue transition hover:-translate-y-0.5 hover:bg-sky-100">
-                Open the console
-              </Link>
-              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-white/30 px-8 py-3.5 text-base font-semibold transition hover:bg-white/10">
-                Star the repository
-              </a>
-            </div>
           </div>
+          <Link href="/console" className="rounded-md bg-paper px-7 py-3.5 text-base font-semibold text-ink transition-colors duration-150 hover:bg-white">
+            Open the console
+          </Link>
         </div>
       </section>
     </>
@@ -305,50 +261,17 @@ export default function LandingPage() {
 
 const heroSegments: Array<{ x1: number; y1: number; x2: number; y2: number }> = [
   { x1: 60, y1: 70, x2: 200, y2: 95 },
-  { x1: 330, y1: 105, x2: 450, y2: 120 },
-  { x1: 565, y1: 130, x2: 600, y2: 155 },
+  { x1: 330, y1: 95, x2: 450, y2: 115 },
+  { x1: 545, y1: 118, x2: 585, y2: 138 },
 ];
 
-function GraphConstellation() {
-  const pts: Array<[number, number, number]> = [
-    [90, 120, 0], [260, 60, 1.2], [420, 150, 2.4], [580, 70, 3.6], [760, 130, .8],
-    [930, 55, 2], [1090, 140, 3.2], [180, 300, 4.2], [350, 380, .4], [520, 320, 1.8],
-    [700, 400, 2.9], [880, 330, 4], [1040, 290, 1], [280, 560, 3.4], [480, 610, .6],
-    [660, 540, 1.6], [850, 600, 2.7], [1010, 520, 3.8],
-  ];
-  const links: Array<[number, number]> = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[0,7],[7,8],[8,9],[9,10],[10,11],[11,12],[8,13],[13,14],[14,15],[15,16],[16,17],[2,9],[4,11],[9,15],[10,16]];
-  return (
-    <svg
-      className="pointer-events-none absolute inset-0 h-full w-full opacity-40"
-      viewBox="0 0 1180 720"
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden
-    >
-      {links.map(([a, b], i) => (
-        <line key={i} x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]} stroke="#3E63C4" strokeWidth="1" opacity="0.35" />
-      ))}
-      {pts.map(([x, y, d], i) => (
-        <circle
-          key={i}
-          cx={x}
-          cy={y}
-          r={i % 5 === 0 ? 5 : 3}
-          fill={i % 4 === 0 ? "#FF4F9A" : "#7FA8FF"}
-          className="twinkle"
-          style={{ animationDelay: `${d}s` }}
-        />
-      ))}
-    </svg>
-  );
-}
-
-function HeroNode({ x, y, label, sub, color }: { x: number; y: number; label: string; sub: string; color: string }) {
+function PathNode({ x, y, label, sub, tone }: { x: number; y: number; label: string; sub: string; tone?: boolean }) {
   return (
     <g transform={`translate(${x},${y})`}>
-      <rect width="128" height="42" rx="11" fill="rgba(255,255,255,.09)" stroke={color} strokeWidth="1.5" />
-      <circle cx="13" cy="21" r="4" fill={color} />
-      <text x="24" y="17" fontSize="10.5" fontWeight="700" fill="#fff">{label}</text>
-      <text x="24" y="31" fontSize="8.5" fill="#cbd5e1">{sub}</text>
+      <rect width="122" height="38" rx={3} fill="#fff" stroke="#E4DCCC" strokeWidth="1" />
+      <circle cx="12" cy="19" r="3.5" fill={tone ? "#12B76A" : "#D6246E"} />
+      <text x="23" y="16" fontSize="10" fontWeight="700" fill="#211B12">{label}</text>
+      <text x="23" y="29" fontSize="8.5" fill="#8C8371">{sub}</text>
     </g>
   );
 }
