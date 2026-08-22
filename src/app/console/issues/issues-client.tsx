@@ -94,15 +94,15 @@ export function IssuesClient({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search issues, resources, projects…"
-            className="w-72 rounded-lg border border-loom-line bg-white px-4 py-2 pr-8 text-sm outline-none focus:border-loom-accent"
+            className="w-72 rounded-lg border border-line bg-white px-4 py-2 pr-8 text-sm outline-none focus:border-accent"
           />
-          <kbd className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-loom-line bg-loom-cream px-1.5 text-[10px] font-semibold text-slate-400">/</kbd>
+          <kbd className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-line bg-cream px-1.5 text-[10px] font-semibold text-slate-400">/</kbd>
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg border border-loom-line bg-white px-3 py-2 text-sm outline-none focus:border-loom-accent">
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-accent">
           <option value="ALL">All statuses</option>
           {STATUSES.map((s) => <option key={s} value={s}>{s.replace("_", " ")}</option>)}
         </select>
-        <select value={sevFilter} onChange={(e) => setSevFilter(e.target.value)} className="rounded-lg border border-loom-line bg-white px-3 py-2 text-sm outline-none focus:border-loom-accent">
+        <select value={sevFilter} onChange={(e) => setSevFilter(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-accent">
           <option value="ALL">All severities</option>
           {SEV_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -113,9 +113,9 @@ export function IssuesClient({
       </div>
 
       {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-loom-line bg-white shadow-card">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-white shadow-card">
         <table className="w-full text-left text-sm">
-          <thead className="bg-loom-cream text-xs uppercase tracking-wide text-slate-500">
+          <thead className="bg-cream text-xs uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-5 py-3.5">Issue</th>
               <th className="px-4 py-3.5">Severity</th>
@@ -124,20 +124,20 @@ export function IssuesClient({
               <th className="px-4 py-3.5">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-loom-line">
+          <tbody className="divide-y divide-line">
             {filtered.map((r) => (
               <Fragment key={r.id}>
                 <tr
                   onClick={() => setExpanded(expanded === r.id ? null : r.id)}
-                  className={`cursor-pointer align-top transition hover:bg-loom-cream/60 ${expanded === r.id ? "bg-loom-mist/40" : ""}`}
+                  className={`cursor-pointer align-top transition hover:bg-cream/60 ${expanded === r.id ? "bg-mist/40" : ""}`}
                 >
                   <td className="max-w-md px-5 py-4">
                     <Link
                       href={`/console/issues/${r.refId}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="flex items-start gap-2 font-semibold text-loom-coal hover:text-loom-accent"
+                      className="flex items-start gap-2 font-semibold text-coal hover:text-accent"
                     >
-                      {r.hasPath && <span title="Attack path" className="mt-0.5 text-xs text-loom-pink">⇶</span>}
+                      {r.hasPath && <span title="Attack path" className="mt-0.5 text-xs text-rose">⇶</span>}
                       <span className="hover:underline">{r.title}</span>
                     </Link>
                     <p className="mt-0.5 text-xs text-slate-400">{r.refId}</p>
@@ -164,7 +164,7 @@ export function IssuesClient({
                   </td>
                 </tr>
                 {expanded === r.id && (
-                  <tr className="bg-loom-mist/30">
+                  <tr className="bg-mist/30">
                     <td colSpan={5} className="px-5 py-5">
                       <p className="text-sm leading-relaxed text-slate-700">{r.description}</p>
                       <div className="mt-3 flex flex-wrap gap-x-8 gap-y-1 text-xs text-slate-500">

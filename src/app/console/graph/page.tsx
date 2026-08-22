@@ -46,7 +46,7 @@ export default async function GraphExplorerPage() {
     <div className="mx-auto max-w-[1400px] p-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-loom-coal">Graph Explorer</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-coal">Graph Explorer</h1>
           <p className="mt-1 text-sm text-slate-500">
             The seeded security graph, drawn. Columns are cloud accounts; edges show how risk
             travels. Click any node to inspect it.

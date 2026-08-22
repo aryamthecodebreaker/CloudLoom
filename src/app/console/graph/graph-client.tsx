@@ -149,6 +149,58 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
     if (selectedId && !visible.has(selectedId)) setSelectedId(null);
   }, [visible, selectedId]);
 
+  // ---- Path finder: directed BFS entry → target ----
+  const [pathFrom, setPathFrom] = useState("");
+  const [pathTo, setPathTo] = useState("");
+  const [pathIds, setPathIds] = useState<string[] | null>(null);
+
+  const adjacency = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const e of edges) {
+      if (!m.has(e.fromId)) m.set(e.fromId, []);
+      m.get(e.fromId)!.push(e.toId);
+    }
+    return m;
+  }, [edges]);
+
+  function findPath() {
+    if (!pathFrom || !pathTo || pathFrom === pathTo) {
+      setPathIds(null);
+      return;
+    }
+    const prev = new Map<string, string | null>([[pathFrom, null]]);
+    const queue = [pathFrom];
+    while (queue.length) {
+      const cur = queue.shift()!;
+      if (cur === pathTo) break;
+      for (const next of adjacency.get(cur) ?? []) {
+        if (!prev.has(next)) {
+          prev.set(next, cur);
+          queue.push(next);
+        }
+      }
+    }
+    if (!prev.has(pathTo)) {
+      setPathIds([]);
+      return;
+    }
+    const path: string[] = [];
+    let cur: string | null = pathTo;
+    while (cur) {
+      path.unshift(cur);
+      cur = prev.get(cur) ?? null;
+    }
+    setPathIds(path);
+  }
+
+  const pathEdgeSet = useMemo(() => {
+    if (!pathIds || pathIds.length < 2) return new Set<string>();
+    const s = new Set<string>();
+    for (let i = 0; i < pathIds.length - 1; i++) s.add(`${pathIds[i]}|${pathIds[i + 1]}`);
+    return s;
+  }, [pathIds]);
+  const onPath = useMemo(() => new Set(pathIds ?? []), [pathIds]);
+
   const selected = selectedId ? nodes.find((n) => n.id === selectedId) ?? null : null;
 
   const toggleProvider = (p: string) => {
@@ -204,8 +256,8 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
               onClick={() => toggleProvider(p)}
               className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
                 activeProviders.has(p)
-                  ? "bg-loom-accent text-white shadow-sm"
-                  : "bg-white text-slate-400 ring-1 ring-loom-line hover:text-slate-600"
+                  ? "bg-accent text-white shadow-sm"
+                  : "bg-white text-slate-400 ring-1 ring-line hover:text-slate-600"
               }`}
             >
               {p}
@@ -216,15 +268,51 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
               type="checkbox"
               checked={riskyOnly}
               onChange={(e) => setRiskyOnly(e.target.checked)}
-              className="h-3.5 w-3.5 accent-loom-accent"
+              className="h-3.5 w-3.5 accent-accent"
             />
             Risky resources only
           </label>
         </div>
 
+        {/* Path finder */}
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md border border-line bg-white px-3 py-2.5">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-ink-faint">Path finder</span>
+          <select value={pathFrom} onChange={(e) => { setPathFrom(e.target.value); setPathIds(null); }} className="max-w-[220px] rounded-md border border-line bg-white px-2 py-1.5 text-xs text-ink outline-none focus:border-ink/50">
+            <option value="">entry node…</option>
+            {[...visible].map((id) => {
+              const n = nodes.find((x) => x.id === id)!;
+              return <option key={id} value={id}>{n.name}</option>;
+            })}
+          </select>
+          <span className="text-xs text-ink-faint">→</span>
+          <select value={pathTo} onChange={(e) => { setPathTo(e.target.value); setPathIds(null); }} className="max-w-[220px] rounded-md border border-line bg-white px-2 py-1.5 text-xs text-ink outline-none focus:border-ink/50">
+            <option value="">target node…</option>
+            {[...visible].map((id) => (
+              <option key={id} value={id}>{nodes.find((x) => x.id === id)!.name}</option>
+            ))}
+          </select>
+          <button onClick={findPath} disabled={!pathFrom || !pathTo || pathFrom === pathTo} className="rounded-md bg-ink px-3 py-1.5 text-xs font-semibold text-paper transition-colors hover:bg-black disabled:opacity-40">
+            Trace
+          </button>
+          {pathIds && pathIds.length > 1 && (
+            <span className="font-mono text-xs text-emerald-600">{pathIds.length - 1} hops</span>
+          )}
+          {pathIds && pathIds.length === 0 && (
+            <span className="font-mono text-xs text-slate-500">no directed path in the seeded graph</span>
+          )}
+          {pathIds && pathIds.length > 0 && (
+            <button onClick={() => setPathIds(null)} className="ml-auto font-mono text-xs text-ink-faint hover:text-ink">clear</button>
+          )}
+        </div>
+
         {/* Canvas */}
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-loom-line bg-loom-coal p-4 shadow-card">
+        <div className="mt-4 overflow-x-auto rounded-2xl border border-line bg-coal p-4 shadow-card">
           <svg viewBox={`0 0 ${layout.width} ${layout.height}`} className="min-w-[900px]" role="img" aria-label="Interactive security graph of the seeded environment" onClick={() => setSelectedId(null)}>
+            <defs>
+              <marker id="trace-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#D6246E" />
+              </marker>
+            </defs>
             {edges.map((e, i) => {
               if (!visible.has(e.fromId) || !visible.has(e.toId)) return null;
               const a = layout.pos.get(e.fromId);
@@ -245,11 +333,31 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
                 <path key={i} d={d} fill="none" stroke={EDGE_COLORS[e.kind] ?? "#8FB3FF"} strokeWidth={focusId && !dim ? 2.4 : 1.5} className={`transition-opacity duration-200 ${dim ? dim : "opacity-70"}`} />
               );
             })}
+            {edges.map((e, i) => {
+              if (!pathEdgeSet.has(`${e.fromId}|${e.toId}`)) return null;
+              const a = layout.pos.get(e.fromId);
+              const b = layout.pos.get(e.toId);
+              if (!a || !b) return null;
+              const x1 = a.x + NODE_W;
+              const y1 = a.y + NODE_H / 2;
+              const x2 = b.x;
+              const y2 = b.y + NODE_H / 2;
+              const midX = (x1 + x2) / 2;
+              const sameCol = a.x === b.x;
+              const d = sameCol
+                ? `M${x1},${y1} C${x1 + 70},${y1} ${x2 - 70},${y2} ${x2},${y2}`
+                : `M${x1},${y1} C${midX},${y1} ${midX},${y2} ${x2},${y2}`;
+              return (
+                <path key={`trace-${i}`} d={d} fill="none" stroke="#D6246E" strokeWidth="3.5" markerEnd="url(#trace-arrow)" />
+              );
+            })}
             {[...visible].map((id) => {
               const n = nodes.find((x) => x.id === id)!;
               const p = layout.pos.get(id)!;
-              const dim = isDimmed(id);
+              const pathActive = !!pathIds && pathIds.length > 1;
+              const dim = isDimmed(id) || (pathActive && !onPath.has(id));
               const dot = n.worstOpenSeverity ? DOT_COLORS[n.worstOpenSeverity] : "#64748B";
+              const isMarked = selectedId === id || onPath.has(id);
               return (
                 <g
                   key={id}
@@ -264,8 +372,8 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
                     height={NODE_H}
                     rx={11}
                     fill="#FFFFFF"
-                    stroke={selectedId === id ? "#2C6BFF" : "#E4E9F2"}
-                    strokeWidth={selectedId === id ? 2.4 : 1.4}
+                    stroke={isMarked ? "#D6246E" : "#E4DCCC"}
+                    strokeWidth={isMarked ? 2.4 : 1.4}
                   />
                   <circle cx={15} cy={NODE_H / 2} r={4.5} fill={dot} />
                   <text x={27} y={19} fontSize={11.5} fontWeight={700} fill="#101828">
@@ -301,17 +409,17 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
       </div>
 
       {/* Detail panel */}
-      <aside className={`rounded-2xl border p-6 ${selected ? "border-loom-accent/40 bg-white shadow-card" : "border-dashed border-loom-line bg-white/60"}`}>
+      <aside className={`rounded-2xl border p-6 ${selected ? "border-accent/40 bg-white shadow-card" : "border-dashed border-line bg-white/60"}`}>
         {selected ? (
           <>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="font-bold text-loom-coal">{selected.name}</h2>
+                <h2 className="font-bold text-coal">{selected.name}</h2>
                 <p className="mt-0.5 text-xs text-slate-500">{selected.type} · {selected.provider}</p>
               </div>
-              <button onClick={() => setSelectedId(null)} aria-label="Close details" className="rounded-lg px-2 py-1 text-slate-400 transition hover:bg-loom-cream hover:text-loom-coal">✕</button>
+              <button onClick={() => setSelectedId(null)} aria-label="Close details" className="rounded-lg px-2 py-1 text-slate-400 transition hover:bg-cream hover:text-coal">✕</button>
             </div>
-            <dl className="mt-4 space-y-1.5 rounded-xl bg-loom-cream p-4 text-xs leading-relaxed">
+            <dl className="mt-4 space-y-1.5 rounded-xl bg-cream p-4 text-xs leading-relaxed">
               <Row k="Account" v={selected.accountName} />
               <Row k="Region" v={selected.region} />
               <Row k="Project" v={selected.projectName} />
@@ -327,12 +435,12 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
             <ul className="mt-2 space-y-2">
               {selected.openIssues.map((i) => (
                 <li key={i.refId}>
-                  <Link href="/console/issues" className="block rounded-lg bg-loom-cream px-3 py-2 transition hover:bg-loom-mist">
+                  <Link href="/console/issues" className="block rounded-lg bg-cream px-3 py-2 transition hover:bg-mist">
                     <span className="flex items-center gap-2">
                       <span className={`badge ${SEVERITY_STYLES[i.severity]}`}>{i.severity}</span>
                       <span className="font-mono text-[10px] text-slate-400">{i.refId}</span>
                     </span>
-                    <span className="mt-1 block text-xs font-medium leading-snug text-loom-coal">{i.title}</span>
+                    <span className="mt-1 block text-xs font-medium leading-snug text-coal">{i.title}</span>
                     <span className={`mt-1 inline-block text-[10px] font-bold ${STATUS_STYLES[i.status].split(" ")[1]}`}>{i.status.replace("_", " ")}</span>
                   </Link>
                 </li>
@@ -348,7 +456,7 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
               <circle cx="12" cy="36" r="4" /><circle cx="38" cy="32" r="4" /><circle cx="24" cy="10" r="4" />
               <path d="M14.5 33l7-20M26.5 12l9 17M15.8 35.5l18-3" />
             </svg>
-            <p className="mt-4 text-sm font-semibold text-loom-coal">Select a node</p>
+            <p className="mt-4 text-sm font-semibold text-coal">Select a node</p>
             <p className="mt-1 max-w-[220px] text-xs leading-relaxed text-slate-500">
               Click any resource in the graph — or just hover — to trace how it connects to the rest of your estate.
             </p>

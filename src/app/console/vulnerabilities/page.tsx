@@ -22,7 +22,7 @@ export default async function VulnerabilitiesPage() {
     <div className="mx-auto max-w-6xl p-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-loom-coal">Vulnerabilities</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-coal">Vulnerabilities</h1>
           <p className="mt-1 text-sm text-slate-500">
             Agentless scan results correlated with the graph — exploited-in-the-wild first.
           </p>
@@ -37,9 +37,9 @@ export default async function VulnerabilitiesPage() {
           const v = hits[0];
           const maxSevOnTargets = Math.max(...hits.map((h) => h.cvss));
           return (
-            <article key={cve} className="rounded-2xl border border-loom-line bg-white shadow-card">
-              <div className="flex flex-wrap items-center gap-3 border-b border-loom-line px-6 py-4">
-                <span className="font-mono text-sm font-bold text-loom-coal">{cve}</span>
+            <article key={cve} className="rounded-2xl border border-line bg-white shadow-card">
+              <div className="flex flex-wrap items-center gap-3 border-b border-line px-6 py-4">
+                <span className="font-mono text-sm font-bold text-coal">{cve}</span>
                 {v.exploitedInWild && (
                   <span className="badge bg-red-600 text-white">Exploited in wild</span>
                 )}
@@ -68,12 +68,12 @@ export default async function VulnerabilitiesPage() {
                   </p>
                   <ul className="space-y-2">
                     {hits.map((h) => (
-                      <li key={h.id + h.resource.id} className="flex items-center justify-between rounded-lg bg-loom-cream px-4 py-2.5 text-sm">
-                        <span className="font-medium text-loom-coal">{h.resource.name}</span>
+                      <li key={h.id + h.resource.id} className="flex items-center justify-between rounded-lg bg-cream px-4 py-2.5 text-sm">
+                        <span className="font-medium text-coal">{h.resource.name}</span>
                         <span className="text-xs text-slate-500">
                           {h.resource.provider} · {h.resource.type}
                           {(h.resource.isPublic || h.resource.hasSensitiveData) && (
-                            <span className="ml-2 font-semibold text-loom-pink">
+                            <span className="ml-2 font-semibold text-rose">
                               {h.resource.isPublic && h.resource.hasSensitiveData ? "public + sensitive" : h.resource.isPublic ? "internet-exposed" : "sensitive data"}
                             </span>
                           )}

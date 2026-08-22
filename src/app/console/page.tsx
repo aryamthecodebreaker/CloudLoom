@@ -29,7 +29,7 @@ export default async function SecurityDashboard() {
     <div className="mx-auto max-w-6xl p-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-loom-coal">Security Dashboard</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-coal">Security Dashboard</h1>
           <p className="mt-1 text-sm text-slate-500">
             Environment-wide risk at a glance · Last sync {formatDate(lastSync)}
           </p>
@@ -40,23 +40,23 @@ export default async function SecurityDashboard() {
         <Link href="/console/issues" className="btn-secondary">View all issues →</Link>
       </header>
 
-      {/* KPI cards */}
+      {/* KPI cards — hierarchy by order and weight, not rainbow strips */}
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi label="Open issues" value={openIssues.length} accent="#E23A82" sub={`${issues.length - openIssues.length} closed`} />
-        <Kpi label="Critical attack paths" value={criticalPaths.length} accent="#D92D20" sub="entry → sensitive data" />
-        <Kpi label="Monitored resources" value={resources} accent="#2C6BFF" sub={`${accounts.filter(a => a.status === "CONNECTED").length}/${accounts.length} connectors healthy`} />
-        <Kpi label="Exploited-in-the-wild CVEs" value={kevCount} accent="#B54708" sub="across your workloads" />
+        <Kpi label="Open issues" value={openIssues.length} sub={`${issues.length - openIssues.length} closed`} alarm={false} />
+        <Kpi label="Critical attack paths" value={criticalPaths.length} sub="entry → sensitive data" alarm={criticalPaths.length > 0} />
+        <Kpi label="Monitored resources" value={resources} sub={`${accounts.filter(a => a.status === "CONNECTED").length}/${accounts.length} connectors healthy`} alarm={false} />
+        <Kpi label="Exploited-in-the-wild CVEs" value={kevCount} sub="across your workloads" alarm={false} />
       </section>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
         {/* Open issues by severity */}
-        <section className="rounded-2xl border border-loom-line bg-white p-6 shadow-card lg:col-span-3">
-          <h2 className="font-bold text-loom-coal">Open issues by severity</h2>
+        <section className="rounded-2xl border border-line bg-white p-6 shadow-card lg:col-span-3">
+          <h2 className="font-bold text-coal">Open issues by severity</h2>
           <div className="mt-5 space-y-4">
             {SEV_ORDER.map((s) => (
               <div key={s} className="flex items-center gap-4">
                 <span className={`badge ${SEVERITY_STYLES[s]} w-28 justify-center`}>{s}</span>
-                <div className="h-6 flex-1 overflow-hidden rounded-md bg-loom-cream">
+                <div className="h-6 flex-1 overflow-hidden rounded-md bg-cream">
                   <div
                     className="h-full rounded-md transition-all"
                     style={{
@@ -65,23 +65,23 @@ export default async function SecurityDashboard() {
                     }}
                   />
                 </div>
-                <span className="w-8 text-right text-sm font-bold text-loom-coal">{bySeverity[s]}</span>
+                <span className="w-8 text-right text-sm font-bold text-coal">{bySeverity[s]}</span>
               </div>
             ))}
           </div>
-          <Link href="/console/issues?status=OPEN" className="mt-6 inline-block text-sm font-semibold text-loom-accent hover:underline">
+          <Link href="/console/issues?status=OPEN" className="mt-6 inline-block text-sm font-semibold text-accent hover:underline">
             Triage open issues →
           </Link>
         </section>
 
         {/* Connector health */}
-        <section className="rounded-2xl border border-loom-line bg-white p-6 shadow-card lg:col-span-2">
-          <h2 className="font-bold text-loom-coal">Connector health</h2>
+        <section className="rounded-2xl border border-line bg-white p-6 shadow-card lg:col-span-2">
+          <h2 className="font-bold text-coal">Connector health</h2>
           <ul className="mt-4 space-y-3">
             {accounts.map((a) => (
-              <li key={a.id} className="flex items-center justify-between rounded-lg bg-loom-cream px-4 py-2.5 text-sm">
+              <li key={a.id} className="flex items-center justify-between rounded-lg bg-cream px-4 py-2.5 text-sm">
                 <div>
-                  <span className="font-semibold text-loom-coal">{a.name}</span>
+                  <span className="font-semibold text-coal">{a.name}</span>
                   <span className="ml-2 text-xs uppercase tracking-wide text-slate-400">{a.provider}</span>
                 </div>
                 <span className={`badge ${a.status === "CONNECTED" ? "bg-emerald-100 text-emerald-700" : a.status === "ERROR" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>
@@ -94,26 +94,26 @@ export default async function SecurityDashboard() {
       </div>
 
       {/* Top attack paths */}
-      <section className="mt-8 rounded-2xl border border-loom-line bg-white p-6 shadow-card">
+      <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-loom-coal">Top attack paths</h2>
-          <Link href="/console/attack-paths" className="text-sm font-semibold text-loom-accent hover:underline">All paths →</Link>
+          <h2 className="font-bold text-coal">Top attack paths</h2>
+          <Link href="/console/attack-paths" className="text-sm font-semibold text-accent hover:underline">All paths →</Link>
         </div>
-        <ul className="mt-4 divide-y divide-loom-line">
+        <ul className="mt-4 divide-y divide-line">
           {criticalPaths.slice(0, 4).map((issue) => {
             const hops = parseAttackPath(issue.attackPathJson);
             return (
               <li key={issue.id}>
                 <Link href="/console/attack-paths" className="group flex items-center gap-4 py-4">
                   <span className={`badge ${SEVERITY_STYLES[issue.severity]} shrink-0`}>{issue.severity}</span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-loom-coal group-hover:text-loom-accent">
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-coal group-hover:text-accent">
                     {issue.title}
                   </span>
                   <span className="hidden shrink-0 items-center gap-1 md:flex">
                     {hops.map((h, idx) => (
                       <span key={idx} className="inline-flex items-center gap-1">
-                        {idx > 0 && <span className="text-xs text-loom-pink">→</span>}
-                        <span className="rounded-md bg-loom-mist px-2 py-1 text-[11px] font-medium text-loom-accent">{h.label}</span>
+                        {idx > 0 && <span className="text-xs text-rose">→</span>}
+                        <span className="rounded-md bg-mist px-2 py-1 text-[11px] font-medium text-accent">{h.label}</span>
                       </span>
                     ))}
                   </span>
@@ -129,12 +129,12 @@ export default async function SecurityDashboard() {
       </section>
 
       {/* Recent cloud activity */}
-      <section className="mt-8 rounded-2xl border border-loom-line bg-white p-6 shadow-card">
+      <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-loom-coal">Recent cloud activity</h2>
+          <h2 className="font-bold text-coal">Recent cloud activity</h2>
           <span className="text-xs text-slate-400">simulated event stream</span>
         </div>
-        <ul className="mt-4 divide-y divide-loom-line">
+        <ul className="mt-4 divide-y divide-line">
           {events.map((ev) => (
             <li key={ev.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3 text-sm">
               <span className={`badge shrink-0 ${EVENT_STYLES[ev.result]}`}>{ev.result}</span>
@@ -142,7 +142,7 @@ export default async function SecurityDashboard() {
                 <span className="font-mono text-xs text-slate-500">{ev.actor}</span>{" "}
                 <span className="text-slate-700">{ev.action}</span>
               </span>
-              <span className="hidden shrink-0 rounded-md bg-loom-cream px-2 py-0.5 text-[11px] font-medium text-slate-500 lg:inline-block">
+              <span className="hidden shrink-0 rounded-md bg-cream px-2 py-0.5 text-[11px] font-medium text-slate-500 lg:inline-block">
                 {ev.source}
               </span>
               <span className="w-24 shrink-0 text-right text-xs text-slate-400">{formatDate(ev.ts)}</span>
@@ -157,13 +157,15 @@ export default async function SecurityDashboard() {
   );
 }
 
-function Kpi({ label, value, sub, accent }: { label: string; value: number; sub: string; accent: string }) {
+function Kpi({ label, value, sub, alarm }: { label: string; value: number; sub: string; alarm: boolean }) {
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-loom-line bg-white p-6 shadow-card">
-      <span className="absolute inset-x-0 top-0 h-1" style={{ background: accent }} aria-hidden />
-      <p className="text-sm font-medium text-slate-500">{label}</p>
-      <p className="mt-2 text-4xl font-extrabold tracking-tight" style={{ color: accent }}>{value}</p>
-      <p className="mt-1 text-xs text-slate-400">{sub}</p>
+    <article className="rounded-md border border-line bg-white p-5">
+      <p className="font-mono text-[11px] uppercase tracking-wider text-ink-faint">{label}</p>
+      <p className={`mt-2 text-3xl font-semibold tracking-tight ${alarm ? "text-red-600" : "text-ink"}`}>
+        {value}
+        {alarm && <span className="ml-2 inline-block h-2 w-2 rounded-full bg-red-600 align-middle" aria-label="needs attention" />}
+      </p>
+      <p className="mt-1 text-xs text-ink-faint">{sub}</p>
     </article>
   );
 }

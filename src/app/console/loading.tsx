@@ -10,7 +10,7 @@ export default function ConsoleLoading() {
       </div>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="rounded-2xl border border-loom-line bg-white p-6 shadow-card">
+          <div key={i} className="rounded-2xl border border-line bg-white p-6 shadow-card">
             <div className="h-4 w-24 animate-pulse rounded bg-slate-100" />
             <div className="mt-3 h-9 w-16 animate-pulse rounded-lg bg-slate-200" />
             <div className="mt-2 h-3 w-32 animate-pulse rounded bg-slate-100" />
@@ -18,7 +18,7 @@ export default function ConsoleLoading() {
         ))}
       </div>
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
-        <div className="rounded-2xl border border-loom-line bg-white p-6 shadow-card lg:col-span-3">
+        <div className="rounded-2xl border border-line bg-white p-6 shadow-card lg:col-span-3">
           <div className="h-5 w-44 animate-pulse rounded bg-slate-200" />
           <div className="mt-6 space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -30,7 +30,7 @@ export default function ConsoleLoading() {
             ))}
           </div>
         </div>
-        <div className="rounded-2xl border border-loom-line bg-white p-6 shadow-card lg:col-span-2">
+        <div className="rounded-2xl border border-line bg-white p-6 shadow-card lg:col-span-2">
           <div className="h-5 w-36 animate-pulse rounded bg-slate-200" />
           <div className="mt-5 space-y-3">
             {Array.from({ length: 6 }).map((_, i) => (

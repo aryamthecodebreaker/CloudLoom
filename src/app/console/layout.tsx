@@ -6,7 +6,7 @@ export default function ConsoleLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="flex min-h-screen bg-loom-cream">
+    <div className="flex min-h-screen bg-cream">
       <ConsoleSidebar />
       <main className="h-screen flex-1 overflow-y-auto">{children}</main>
     </div>

@@ -17,7 +17,7 @@ export default async function CompliancePage() {
   return (
     <div className="mx-auto max-w-6xl p-8">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight text-loom-coal">Compliance Posture</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-coal">Compliance Posture</h1>
         <p className="mt-1 text-sm text-slate-500">
           Out-of-the-box frameworks evaluated continuously against the security graph.
         </p>
@@ -31,7 +31,7 @@ export default async function CompliancePage() {
           const r = 52;
           const circ = 2 * Math.PI * r;
           return (
-            <article key={f.id} className="rounded-2xl border border-loom-line bg-white p-6 text-center shadow-card transition hover:-translate-y-0.5">
+            <article key={f.id} className="rounded-2xl border border-line bg-white p-6 text-center shadow-card transition hover:-translate-y-0.5">
               <span className="badge mb-3" style={{ background: `${color}14`, color }}>{f.family}</span>
               <div className="relative mx-auto h-36 w-36">
                 <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
@@ -44,11 +44,11 @@ export default async function CompliancePage() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-extrabold text-loom-coal">{pct}%</span>
+                  <span className="text-2xl font-extrabold text-coal">{pct}%</span>
                   <span className="text-[10px] uppercase tracking-wide text-slate-400">passing</span>
                 </div>
               </div>
-              <h2 className="mt-4 font-bold text-loom-coal">{f.name}</h2>
+              <h2 className="mt-4 font-bold text-coal">{f.name}</h2>
               <p className="mt-1 text-xs text-slate-500">
                 {f.passed} passed · <span className="font-semibold text-orange-600">{f.failed} failing</span> of {total} controls
               </p>
@@ -57,8 +57,8 @@ export default async function CompliancePage() {
         })}
       </section>
 
-      <section className="mt-8 rounded-2xl border border-loom-line bg-white p-6 shadow-card">
-        <h2 className="font-bold text-loom-coal">Framework heatmap</h2>
+      <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
+        <h2 className="font-bold text-coal">Framework heatmap</h2>
         <div className="mt-4 space-y-3">
           {frameworks.map((f) => {
             const total = f.passed + f.failed;
@@ -69,7 +69,7 @@ export default async function CompliancePage() {
                   <div className="bg-emerald-400 transition-all" style={{ width: `${(f.passed / total) * 100}%` }} />
                   <div className="bg-orange-300 transition-all" style={{ width: `${(f.failed / total) * 100}%` }} />
                 </div>
-                <span className="w-12 text-right text-sm font-bold text-loom-coal">{Math.round((f.passed / total) * 100)}%</span>
+                <span className="w-12 text-right text-sm font-bold text-coal">{Math.round((f.passed / total) * 100)}%</span>
               </div>
             );
           })}
