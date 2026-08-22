@@ -35,8 +35,17 @@ export function SiteNav() {
             href="https://github.com/aryamthecodebreaker/CloudLoom"
             target="_blank"
             rel="noopener noreferrer"
+            className="hidden items-center gap-2 rounded-lg border border-loom-line px-4 py-2.5 text-sm font-semibold text-loom-navy transition hover:border-loom-blue hover:text-loom-blue sm:inline-flex"
+          >
+            <IconGitHub className="h-4 w-4" />
+            GitHub
+          </a>
+          <a
+            href="https://github.com/aryamthecodebreaker/CloudLoom"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="CloudLoom on GitHub"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-loom-navy transition hover:bg-loom-cloud hover:text-loom-blue"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-loom-navy transition hover:bg-loom-cloud hover:text-loom-blue sm:hidden"
           >
             <IconGitHub className="h-5 w-5" />
           </a>

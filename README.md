@@ -8,9 +8,13 @@ CloudLoom weaves every resource, identity, network path, and vulnerability in yo
 stack into a single security graph — so you can see the attack paths an attacker
 would actually walk, and cut them at the source.
 
-`Next.js 14` · `TypeScript` · `Tailwind CSS` · `Prisma v5` · `SQLite`
+`Next.js 14` · `TypeScript` · `Tailwind CSS` · `Prisma v5` · `Postgres`
 
-[Explore the demo console](#-quickstart) · [Report a bug](../../issues) · [Contribute](#-contributing)
+[**🚀 Live demo**](https://cloudloom-zeta.vercel.app/console) · [**⭐ Repository**](https://github.com/aryamthecodebreaker/CloudLoom) · [**📦 Quickstart**](#-quickstart) · [Contribute](#-contributing)
+
+[![Deployed on Vercel](https://img.shields.io/badge/live-cloudloom--zeta.vercel.app-2C6BFF)](https://cloudloom-zeta.vercel.app)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green)](./LICENSE)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)
 
 </div>
 
@@ -129,10 +133,14 @@ src/
 │   ├── (site)/               # Marketing pages: landing, platform
 │   ├── console/              # CNAPP dashboard: overview, issues, attack paths,
 │   │                         #   inventory, vulnerabilities, compliance, connectors
+│   │                         #   + loading skeleton & error boundary
 │   ├── api/issues/[id]/      # PATCH endpoint for issue status transitions
 │   ├── layout.tsx            # Root layout + metadata
-│   └── globals.css           # Tailwind layers + shared utilities
-├── components/               # Logo, site chrome, console sidebar
+│   ├── icon.svg              # Favicon (woven-thread mark)
+│   ├── opengraph-image.tsx   # Social link-preview card
+│   ├── not-found.tsx         # Branded 404
+│   └── globals.css           # Tailwind layers + motion utilities
+├── components/               # Logo, nav, footer, sidebar, icons, motion helpers
 └── lib/
     ├── db.ts                 # Prisma client (dev-safe singleton)
     └── ui.ts                 # Severity/status styles, attack-path helpers
