@@ -32,13 +32,15 @@ CloudLoom is a full-stack, self-contained demo of a modern CNAPP
 
 ### The console includes
 
-- **Security Dashboard** — environment-wide KPIs, open issues by severity, connector health, top attack paths
-- **Issues** — prioritized findings with severities (`CRITICAL → INFORMATIONAL`) and statuses (`OPEN`, `IN_PROGRESS`, `RESOLVED`, `REJECTED`); update status inline and it persists
+- **Security Dashboard** — environment-wide KPIs, open issues by severity, connector health, top attack paths, and a simulated cloud-activity threat feed
+- **Graph Explorer** — the seeded security graph drawn as an interactive canvas: hover to trace connections, click to inspect, filter by provider, and query it in a WQL-lite syntax (`severity=critical and exposure=public`)
+- **Issues** — prioritized findings (`CRITICAL → INFORMATIONAL`, `OPEN → RESOLVED`) with persistent inline triage, full detail pages, `/`-to-search, shareable filter URLs, and CSV export
 - **Attack Paths** — toxic combinations rendered hop-by-hop (entry point → workload → identity → sensitive data), with "break the first hop" guidance
-- **Inventory** — full resource catalog across AWS, Azure, GCP, Kubernetes & OCI with public/sensitive flags
+- **Inventory** — resource catalog across AWS, Azure, GCP, Kubernetes & OCI with public/sensitive flags
 - **Vulnerabilities** — CVEs grouped across affected resources, exploited-in-the-wild highlighted, with fix versions
 - **Compliance** — donut + heatmap views for CIS, SOC 2, ISO 27001, PCI DSS, HIPAA & GDPR posture
-- **Connectors** — cloud account connection status with scan freshness
+
+All demo data is seeded into your own Postgres — **no real cloud accounts are ever connected**.
 
 All demo data is generated — **no real cloud accounts are ever connected**.
 

@@ -23,12 +23,62 @@ const DOT_COLORS: Record<string, string> = {
   CRITICAL: "#D92D20", HIGH: "#F76808", MEDIUM: "#F59E0B", LOW: "#0BA5EC",
 };
 
+// ---- WQL-lite: tiny query language over the graph ----
+type Clause = { key: string; value: string };
+const QUERY_KEYS = ["severity", "exposure", "data", "type", "provider", "region"];
+
+export function parseQuery(q: string): { clauses: Clause[]; error: string | null } {
+  const trimmed = q.trim();
+  if (!trimmed) return { clauses: [], error: null };
+  const clauses: Clause[] = [];
+  for (const part of trimmed.split(/\s+and\s+/i)) {
+    const token = part.trim();
+    const m = token.match(/^(\w+)\s*[:=]\s*(.+)$/);
+    if (!m) {
+      // bare word → substring over name/type
+      clauses.push({ key: "name", value: token.toLowerCase() });
+      continue;
+    }
+    const [, key, value] = m;
+    if (!QUERY_KEYS.includes(key)) {
+      return { clauses: [], error: `Unknown field "${key}" — valid: ${QUERY_KEYS.join(", ")}` };
+    }
+    clauses.push({ key, value: value.toLowerCase().replace(/["']/g, "").trim() });
+  }
+  return { clauses, error: null };
+}
+
+function matchClause(n: GraphNode, { key, value }: Clause): boolean {
+  switch (key) {
+    case "name":
+      return n.name.toLowerCase().includes(value) || n.type.toLowerCase().includes(value);
+    case "severity":
+      if (value === "high+") return n.worstOpenSeverity === "CRITICAL" || n.worstOpenSeverity === "HIGH";
+      return (n.worstOpenSeverity ?? "").toLowerCase() === value;
+    case "exposure":
+      return value === "public" ? n.isPublic : !n.isPublic;
+    case "data":
+      return n.hasSensitiveData === (value === "sensitive" || value === "true");
+    case "type":
+      return n.type.toLowerCase().includes(value);
+    case "provider":
+      return n.provider.toLowerCase() === value;
+    case "region":
+      return n.region.toLowerCase().includes(value);
+    default:
+      return true;
+  }
+}
+
 export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: GraphEdgeInput[] }) {
   const providers = useMemo(() => [...new Set(nodes.map((n) => n.provider))], [nodes]);
   const [activeProviders, setActive] = useState<Set<string>>(new Set(providers));
   const [riskyOnly, setRiskyOnly] = useState(false);
+  const [rawQuery, setRawQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
+
+  const { clauses, error: queryError } = useMemo(() => parseQuery(rawQuery), [rawQuery]);
 
   const visible = useMemo(
     () =>
@@ -36,9 +86,10 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
         nodes
           .filter((n) => activeProviders.has(n.provider))
           .filter((n) => !riskyOnly || n.worstOpenSeverity)
+          .filter((n) => clauses.every((c) => matchClause(n, c)))
           .map((n) => n.id)
       ),
-    [nodes, activeProviders, riskyOnly]
+    [nodes, activeProviders, riskyOnly, clauses]
   );
 
   const layout = useMemo(() => {
@@ -112,8 +163,41 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
   return (
     <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
       <div>
+        {/* Query bar */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="min-w-[260px] flex-1">
+            <input
+              value={rawQuery}
+              onChange={(e) => setRawQuery(e.target.value)}
+              placeholder={`query the graph — e.g. severity=critical and exposure=public`}
+              spellCheck={false}
+              className={`w-full rounded-md border bg-white px-3.5 py-2 font-mono text-[13px] text-ink outline-none transition-colors placeholder:text-slate-400 ${
+                queryError ? "border-accent" : "border-line focus:border-ink/50"
+              }`}
+            />
+            {queryError ? (
+              <p className="mt-1.5 font-mono text-xs text-accent">{queryError}</p>
+            ) : rawQuery.trim() ? (
+              <p className="mt-1.5 font-mono text-xs text-emerald-600">
+                {visible.size} of {nodes.length} resources match
+              </p>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {["severity=critical", "exposure=public and data=sensitive", "provider=gcp"].map((ex) => (
+              <button
+                key={ex}
+                onClick={() => setRawQuery(ex)}
+                className="rounded-full border border-line px-3 py-1 font-mono text-[11px] text-ink-faint transition-colors hover:border-ink/40 hover:text-ink"
+              >
+                {ex}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           {providers.map((p) => (
             <button
               key={p}
