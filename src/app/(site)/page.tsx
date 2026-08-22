@@ -100,7 +100,7 @@ export default function LandingPage() {
               <span className="font-mono text-xs text-white/50">quickstart</span>
               <span className="font-mono text-[10px] text-white/30">bash — 80×24</span>
             </div>
-            <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-7 text-white/85"><code>{`$ git clone github.com/aryamthecodebreaker/CloudLoom
+            <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-7 text-white/85"><code>{`$ git clone https://github.com/aryamthecodebreaker/CloudLoom.git
 $ cd CloudLoom && cp .env.example .env
 $ npm install
 

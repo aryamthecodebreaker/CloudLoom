@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "./logo";
+import { GITHUB_URL } from "./site-chrome";
 
 const links = [
   { href: "/platform", label: "Platform" },
@@ -13,6 +14,11 @@ const links = [
 export function SiteNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  // Back/forward navigation doesn't fire link onClick handlers — close on route change
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur-sm">
@@ -35,7 +41,7 @@ export function SiteNav() {
         </div>
         <div className="flex items-center gap-3">
           <a
-            href="https://github.com/aryamthecodebreaker/CloudLoom"
+            href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden font-mono text-[13px] text-ink-soft transition-colors duration-150 hover:text-accent sm:block"

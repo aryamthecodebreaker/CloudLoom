@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { SEVERITY_STYLES, STATUS_STYLES } from "@/lib/ui";
+import { severityStyle, statusStyle } from "@/lib/ui";
 
 type Row = {
   id: string; refId: string; title: string; description: string;
@@ -142,7 +142,7 @@ export function IssuesClient({
                     </Link>
                     <p className="mt-0.5 text-xs text-slate-400">{r.refId}</p>
                   </td>
-                  <td className="px-4 py-4"><span className={`badge ${SEVERITY_STYLES[r.severity]}`}>{r.severity}</span></td>
+                  <td className="px-4 py-4"><span className={`badge ${severityStyle(r.severity)}`}>{r.severity}</span></td>
                   <td className="hidden px-4 py-4 lg:table-cell">
                     <p className="font-medium text-slate-700">{r.controlId}</p>
                     <p className="max-w-[220px] truncate text-xs text-slate-400">{r.controlName}</p>
@@ -155,7 +155,7 @@ export function IssuesClient({
                     <select
                       value={r.status}
                       onChange={(e) => updateStatus(r.id, e.target.value)}
-                      className={`cursor-pointer rounded-full border-0 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide outline-none ring-offset-1 focus:ring-2 ${STATUS_STYLES[r.status]}`}
+                      className={`cursor-pointer rounded-full border-0 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide outline-none ring-offset-1 focus:ring-2 ${statusStyle(r.status)}`}
                     >
                       {STATUSES.map((s) => (
                         <option key={s} value={s}>{s.replace("_", " ")}</option>

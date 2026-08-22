@@ -26,7 +26,7 @@ export default async function CompliancePage() {
       <section className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {frameworks.map((f) => {
           const total = f.passed + f.failed;
-          const pct = Math.round((f.passed / total) * 100);
+          const pct = total > 0 ? Math.round((f.passed / total) * 100) : 0;
           const color = FAMILY_COLORS[f.family] ?? "#2C6BFF";
           const r = 52;
           const circ = 2 * Math.PI * r;
@@ -39,7 +39,7 @@ export default async function CompliancePage() {
                   <circle
                     cx="60" cy="60" r={r} fill="none"
                     stroke={pct >= 90 ? "#12B76A" : pct >= 75 ? color : "#F76808"}
-                    strokeWidth="11" strokeLinecap="round"
+                    strokeWidth="11" strokeLinecap="butt"
                     strokeDasharray={`${(pct / 100) * circ} ${circ}`}
                   />
                 </svg>

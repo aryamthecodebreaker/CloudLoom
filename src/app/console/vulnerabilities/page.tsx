@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { SEVERITY_STYLES } from "@/lib/ui";
+import { severityStyle } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Vulnerabilities" };
@@ -43,7 +43,7 @@ export default async function VulnerabilitiesPage() {
                 {v.exploitedInWild && (
                   <span className="badge bg-red-600 text-white">Exploited in wild</span>
                 )}
-                <span className={`badge ${SEVERITY_STYLES[v.severity]}`}>{v.severity}</span>
+                <span className={`badge ${severityStyle(v.severity)}`}>{v.severity}</span>
                 <span className="ml-auto inline-flex items-center gap-2">
                   <span className="text-xs text-slate-400">Max CVSS</span>
                   <span

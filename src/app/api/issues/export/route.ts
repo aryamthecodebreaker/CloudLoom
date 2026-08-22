@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 function csvCell(value: string | number): string {
   const s = String(value);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  return /["',\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
 export async function GET() {
@@ -38,7 +38,8 @@ export async function GET() {
       .map(csvCell)
       .join(",")
   );
-  const csv = [header.join(","), ...rows].join("\n");
+  // UTF-8 BOM so Excel on Windows reads the encoding correctly
+  const csv = "\uFEFF" + [header.join(","), ...rows].join("\n");
 
   return new NextResponse(csv, {
     headers: {

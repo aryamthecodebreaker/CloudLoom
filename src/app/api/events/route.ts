@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { guardMutation } from "@/lib/guard";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,9 @@ export const dynamic = "force-dynamic";
  * Called by the "simulate fix" action on issue detail pages.
  */
 export async function POST(req: NextRequest) {
+  const denied = guardMutation(req);
+  if (denied) return denied;
+
   const body = await req.json().catch(() => null);
   const refId = typeof body?.refId === "string" ? body.refId : null;
   if (!refId || !/^CL-\d{3,5}$/.test(refId)) {

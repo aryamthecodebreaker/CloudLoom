@@ -1,24 +1,29 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { EVENT_STYLES, SEVERITY_STYLES, STATUS_STYLES, formatDate, parseAttackPath } from "@/lib/ui";
+import { SEVERITIES, eventStyle, formatDate, parseAttackPath, severityStyle, statusStyle } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 
-const SEV_ORDER = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"];
-
 export default async function SecurityDashboard() {
-  const [issues, accounts, resources, vulns, events] = await Promise.all([
-    db.issue.findMany({ include: { resource: true, control: true }, orderBy: { createdAt: "desc" } }),
-    db.cloudAccount.findMany(),
-    db.resource.count(),
-    db.vulnerability.findMany(),
-    db.cloudEvent.findMany({ orderBy: { ts: "desc" }, take: 6 }),
-  ]);
+  const [severityGroups, openCount, closedCount, accounts, resources, kevCount, criticalPaths, events] =
+    await Promise.all([
+      db.issue.groupBy({ by: ["severity"], where: { status: "OPEN" }, _count: { _all: true } }),
+      db.issue.count({ where: { status: "OPEN" } }),
+      db.issue.count({ where: { status: { notIn: ["OPEN"] } } }),
+      db.cloudAccount.findMany(),
+      db.resource.count(),
+      db.vulnerability.count({ where: { exploitedInWild: true } }),
+      db.issue.findMany({
+        where: { attackPathJson: { not: null }, status: { in: ["OPEN", "IN_PROGRESS"] } },
+        orderBy: { refId: "desc" },
+        take: 4,
+      }),
+      db.cloudEvent.findMany({ orderBy: { ts: "desc" }, take: 6 }),
+    ]);
 
-  const openIssues = issues.filter((i) => i.status === "OPEN");
-  const criticalPaths = issues.filter((i) => i.attackPathJson && (i.status === "OPEN" || i.status === "IN_PROGRESS"));
-  const kevCount = vulns.filter((v) => v.exploitedInWild).length;
-  const bySeverity = Object.fromEntries(SEV_ORDER.map((s) => [s, openIssues.filter((i) => i.severity === s).length]));
+  const bySeverity = Object.fromEntries(
+    SEVERITIES.map((s) => [s, severityGroups.find((g) => g.severity === s)?._count._all ?? 0])
+  );
   const maxSev = Math.max(1, ...Object.values(bySeverity));
   const lastSync = accounts.reduce<Date | null>(
     (latest, a) => (a.lastScanAt && (!latest || a.lastScanAt > latest) ? a.lastScanAt : latest),
@@ -42,7 +47,7 @@ export default async function SecurityDashboard() {
 
       {/* KPI cards — hierarchy by order and weight, not rainbow strips */}
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi label="Open issues" value={openIssues.length} sub={`${issues.length - openIssues.length} closed`} alarm={false} />
+        <Kpi label="Open issues" value={openCount} sub={`${closedCount} closed`} alarm={false} />
         <Kpi label="Critical attack paths" value={criticalPaths.length} sub="entry → sensitive data" alarm={criticalPaths.length > 0} />
         <Kpi label="Monitored resources" value={resources} sub={`${accounts.filter(a => a.status === "CONNECTED").length}/${accounts.length} connectors healthy`} alarm={false} />
         <Kpi label="Exploited-in-the-wild CVEs" value={kevCount} sub="across your workloads" alarm={false} />
@@ -53,9 +58,9 @@ export default async function SecurityDashboard() {
         <section className="rounded-2xl border border-line bg-white p-6 shadow-card lg:col-span-3">
           <h2 className="font-bold text-coal">Open issues by severity</h2>
           <div className="mt-5 space-y-4">
-            {SEV_ORDER.map((s) => (
+            {SEVERITIES.map((s) => (
               <div key={s} className="flex items-center gap-4">
-                <span className={`badge ${SEVERITY_STYLES[s]} w-28 justify-center`}>{s}</span>
+                <span className={`badge ${severityStyle(s)} w-28 justify-center`}>{s}</span>
                 <div className="h-6 flex-1 overflow-hidden rounded-md bg-cream">
                   <div
                     className="h-full rounded-md transition-all"
@@ -100,12 +105,12 @@ export default async function SecurityDashboard() {
           <Link href="/console/attack-paths" className="text-sm font-semibold text-accent hover:underline">All paths →</Link>
         </div>
         <ul className="mt-4 divide-y divide-line">
-          {criticalPaths.slice(0, 4).map((issue) => {
+          {criticalPaths.map((issue) => {
             const hops = parseAttackPath(issue.attackPathJson);
             return (
               <li key={issue.id}>
                 <Link href="/console/attack-paths" className="group flex items-center gap-4 py-4">
-                  <span className={`badge ${SEVERITY_STYLES[issue.severity]} shrink-0`}>{issue.severity}</span>
+                  <span className={`badge ${severityStyle(issue.severity)} shrink-0`}>{issue.severity}</span>
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-coal group-hover:text-accent">
                     {issue.title}
                   </span>
@@ -117,7 +122,7 @@ export default async function SecurityDashboard() {
                       </span>
                     ))}
                   </span>
-                  <span className={`badge ${STATUS_STYLES[issue.status]} shrink-0`}>{issue.status.replace("_", " ")}</span>
+                  <span className={`badge ${statusStyle(issue.status)} shrink-0`}>{issue.status.replace("_", " ")}</span>
                 </Link>
               </li>
             );
@@ -137,7 +142,7 @@ export default async function SecurityDashboard() {
         <ul className="mt-4 divide-y divide-line">
           {events.map((ev) => (
             <li key={ev.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3 text-sm">
-              <span className={`badge shrink-0 ${EVENT_STYLES[ev.result]}`}>{ev.result}</span>
+              <span className={`badge shrink-0 ${eventStyle(ev.result)}`}>{ev.result}</span>
               <span className="min-w-0 flex-1">
                 <span className="font-mono text-xs text-slate-500">{ev.actor}</span>{" "}
                 <span className="text-slate-700">{ev.action}</span>

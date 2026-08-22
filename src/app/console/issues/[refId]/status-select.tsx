@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { STATUS_STYLES } from "@/lib/ui";
+import { statusStyle } from "@/lib/ui";
 
 const STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "REJECTED"];
 
@@ -35,7 +35,7 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
         value={value}
         onChange={(e) => update(e.target.value)}
         disabled={pending}
-        className={`cursor-pointer rounded-full border-0 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide outline-none ring-offset-1 focus:ring-2 disabled:opacity-60 ${STATUS_STYLES[value]}`}
+        className={`cursor-pointer rounded-full border-0 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide outline-none ring-offset-1 focus:ring-2 disabled:opacity-60 ${statusStyle(value)}`}
       >
         {STATUSES.map((s) => (
           <option key={s} value={s}>{s.replace("_", " ")}</option>

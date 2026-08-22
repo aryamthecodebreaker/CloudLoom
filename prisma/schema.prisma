@@ -16,6 +16,8 @@ model CloudAccount {
   lastScanAt  DateTime?
   resources   Resource[]
   createdAt   DateTime   @default(now())
+
+  @@unique([provider, externalId])
 }
 
 model Project {
@@ -35,14 +37,17 @@ model Resource {
   isPublic         Boolean       @default(false)
   hasSensitiveData Boolean       @default(false)
   tags             String        @default("{}")
+  lastScanAt       DateTime?
   cloudAccountId   String
-  cloudAccount     CloudAccount  @relation(fields: [cloudAccountId], references: [id])
+  cloudAccount     CloudAccount  @relation(fields: [cloudAccountId], references: [id], onDelete: Cascade)
   projectId        String?
   project          Project?      @relation(fields: [projectId], references: [id])
   issues           Issue[]
   vulnerabilities  Vulnerability[]
-  edgesOut         GraphEdge[]     @relation("edgesOut")
-  edgesIn          GraphEdge[]     @relation("edgesIn")
+  edgesOut         GraphEdge[]   @relation("edgesOut")
+  edgesIn          GraphEdge[]   @relation("edgesIn")
+
+  @@unique([externalId, cloudAccountId])
 }
 
 model Control {
@@ -72,6 +77,8 @@ model Issue {
   updatedAt     DateTime @updatedAt
 
   @@unique([refId])
+  @@index([status])
+  @@index([severity])
 }
 
 model Vulnerability {
@@ -92,7 +99,7 @@ model Vulnerability {
 
 model ComplianceFramework {
   id     String @id @default(cuid())
-  name   String
+  name   String @unique
   family String
   passed Int
   failed Int
@@ -105,6 +112,10 @@ model GraphEdge {
   from   Resource @relation("edgesOut", fields: [fromId], references: [id], onDelete: Cascade)
   toId   String
   to     Resource @relation("edgesIn", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, kind, toId])
+  @@index([fromId])
+  @@index([toId])
 }
 
 model CloudEvent {
@@ -115,4 +126,6 @@ model CloudEvent {
   target String
   result String
   source String
+
+  @@index([ts])
 }

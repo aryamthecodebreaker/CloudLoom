@@ -12,8 +12,8 @@ export default function ConsoleError({
       <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-2xl text-red-500">!</span>
       <h1 className="mt-5 text-xl font-bold text-coal">The graph is unreachable</h1>
       <p className="mt-2 text-sm leading-relaxed text-slate-600">
-        We couldn&apos;t query the database. This is usually a transient connection
-        hiccup between Vercel and Supabase — retrying normally fixes it.
+        We couldn&apos;t query the database. This is usually a transient network
+        hiccup between the app and its Postgres instance — retrying normally fixes it.
       </p>
       {error.digest && (
         <p className="mt-2 font-mono text-[11px] text-slate-400">digest: {error.digest}</p>

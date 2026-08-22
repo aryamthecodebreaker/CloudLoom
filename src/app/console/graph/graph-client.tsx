@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { EDGE_COLORS, SEVERITY_STYLES, STATUS_STYLES } from "@/lib/ui";
+import { EDGE_LEGEND, edgeColor, severityStyle, statusStyle } from "@/lib/ui";
 
 export type GraphNode = {
   id: string; name: string; type: string; provider: string; accountName: string;
@@ -330,7 +330,7 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
               const dim =
                 focusId && e.fromId !== focusId && e.toId !== focusId ? "opacity-10" : "";
               return (
-                <path key={i} d={d} fill="none" stroke={EDGE_COLORS[e.kind] ?? "#8FB3FF"} strokeWidth={focusId && !dim ? 2.4 : 1.5} className={`transition-opacity duration-200 ${dim ? dim : "opacity-70"}`} />
+                <path key={i} d={d} fill="none" stroke={edgeColor(e.kind)} strokeWidth={focusId && !dim ? 2.4 : 1.5} className={`transition-opacity duration-200 ${dim ? dim : "opacity-70"}`} />
               );
             })}
             {edges.map((e, i) => {
@@ -397,7 +397,7 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
 
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500">
-          {Object.entries(EDGE_COLORS).map(([k, c]) => (
+          {EDGE_LEGEND.map(([k, c]) => (
             <span key={k} className="inline-flex items-center gap-1.5">
               <span className="inline-block h-0.5 w-5 rounded" style={{ background: c }} />
               {k.replace(/_/g, " ").toLowerCase()}
@@ -437,11 +437,11 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
                 <li key={i.refId}>
                   <Link href="/console/issues" className="block rounded-lg bg-cream px-3 py-2 transition hover:bg-mist">
                     <span className="flex items-center gap-2">
-                      <span className={`badge ${SEVERITY_STYLES[i.severity]}`}>{i.severity}</span>
+                      <span className={`badge ${severityStyle(i.severity)}`}>{i.severity}</span>
                       <span className="font-mono text-[10px] text-slate-400">{i.refId}</span>
                     </span>
                     <span className="mt-1 block text-xs font-medium leading-snug text-coal">{i.title}</span>
-                    <span className={`mt-1 inline-block text-[10px] font-bold ${STATUS_STYLES[i.status].split(" ")[1]}`}>{i.status.replace("_", " ")}</span>
+                    <span className={`mt-1 inline-block text-[10px] font-bold ${statusStyle(i.status).split(" ")[1]}`}>{i.status.replace("_", " ")}</span>
                   </Link>
                 </li>
               ))}

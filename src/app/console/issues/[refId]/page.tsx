@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { SEVERITY_STYLES, formatDate, parseAttackPath } from "@/lib/ui";
+import { formatDate, parseAttackPath, severityStyle } from "@/lib/ui";
 import { StatusSelect } from "./status-select";
 import { FixButton } from "./fix-button";
 
@@ -37,7 +37,7 @@ export default async function IssueDetailPage({
       <header className="mt-4 flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`badge ${SEVERITY_STYLES[issue.severity]}`}>{issue.severity}</span>
+            <span className={`badge ${severityStyle(issue.severity)}`}>{issue.severity}</span>
             <span className="font-mono text-xs text-slate-400">{issue.refId}</span>
             <span className="text-xs text-slate-400">· opened {formatDate(issue.createdAt)}</span>
           </div>

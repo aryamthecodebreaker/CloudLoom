@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { SEVERITY_STYLES, STATUS_STYLES, parseAttackPath, type AttackHop } from "@/lib/ui";
+import { parseAttackPath, severityStyle, statusStyle, type AttackHop } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Attack Paths" };
@@ -49,8 +49,8 @@ export default async function AttackPathsPage() {
           return (
             <article key={issue.id} className="overflow-hidden rounded-2xl border border-line bg-white shadow-card">
               <div className="flex flex-wrap items-center gap-3 border-b border-line bg-cream px-6 py-4">
-                <span className={`badge ${SEVERITY_STYLES[issue.severity]}`}>{issue.severity}</span>
-                <span className={`badge ${STATUS_STYLES[issue.status]}`}>{issue.status.replace("_", " ")}</span>
+                <span className={`badge ${severityStyle(issue.severity)}`}>{issue.severity}</span>
+                <span className={`badge ${statusStyle(issue.status)}`}>{issue.status.replace("_", " ")}</span>
                 <h2 className="min-w-0 flex-1 truncate font-semibold text-coal">{issue.title}</h2>
                 <Link href={`/console/issues?ref=${issue.refId}`} className="text-xs font-semibold text-accent hover:underline">
                   Manage in issues →

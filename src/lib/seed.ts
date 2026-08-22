@@ -28,9 +28,9 @@ export async function runSeed(): Promise<SeedCounts> {
       { name: "gcp-ml-platform", provider: "GCP", externalId: "ml-prod-318204", status: "CONNECTED" },
       { name: "k8s-edge-clusters", provider: "Kubernetes", externalId: "edge-fleet", status: "CONNECTED" },
       { name: "oci-archive", provider: "OCI", externalId: "ocid1.tenancy.archive", status: "ERROR" },
-    ].map((a) =>
+    ].map((a, idx) =>
       db.cloudAccount.create({
-        data: { ...a, lastScanAt: a.status === "ERROR" ? daysAgo(6) : daysAgo(Math.random() * 0.5) },
+        data: { ...a, lastScanAt: a.status === "ERROR" ? daysAgo(6) : daysAgo(0.2 * (idx + 1)) },
       })
     )
   );
@@ -73,7 +73,7 @@ export async function runSeed(): Promise<SeedCounts> {
     { name: "gpu-infer-pool", type: "Container", provider: "GCP", region: "us-central1", acctId: gcp.id, projectId: projects[2].id, externalId: "gke/ml-infer-pool" },
     { name: "model-weights-store", type: "Object Storage", provider: "GCP", region: "us-central1", acctId: gcp.id, projectId: projects[2].id, sensitive: true, externalId: "gs://model-weights" },
     { name: "vertex-pipeline-sa", type: "Identity", provider: "GCP", region: "us-central1", acctId: gcp.id, projectId: projects[2].id, externalId: "sa/vertex-pipeline@ml-prod" },
-    { name: "pubsub-telemetry", type: "Message Queue", provider: "GCP", region: "us-central1", acctId: gcp.id, externalId: "pubsub/telemetry" },
+    { name: "pubsub-telemetry", type: "Pub/Sub topic", provider: "GCP", region: "us-central1", acctId: gcp.id, externalId: "pubsub/telemetry" },
     // K8s
     { name: "edge-ingress-nginx", type: "Kubernetes Ingress", provider: "Kubernetes", region: "multi-cloud", acctId: k8s.id, projectId: projects[3].id, isPublic: true, externalId: "ingress/edge-ingress-nginx" },
     { name: "checkout-service", type: "Kubernetes Workload", provider: "Kubernetes", region: "multi-cloud", acctId: k8s.id, projectId: projects[0].id, externalId: "deploy/checkout-service" },
@@ -112,22 +112,22 @@ export async function runSeed(): Promise<SeedCounts> {
     JSON.stringify(hops);
 
   const issuesData = [
-    { refId: "CL-1042", title: "Public VM with critical RCE vulnerability can reach payments database", severity: "CRITICAL", status: "OPEN", control: "C-1001", resource: byName["prod-sgx-worker"], attackPathJson: ap([
-        { label: "Internet", sublabel: "0.0.0.0/0 : HTTPS", kind: "entry" },
-        { label: "prod-sgx-worker", sublabel: "CVE-2026-31142 · RCE · CVSS 9.8", kind: "workload" },
-        { label: "prod-api-asg role", sublabel: "iam:PassRole → rds:Connect", kind: "identity" },
-        { label: "prod-payments-db", sublabel: "Cardholder records · 4.2M rows", kind: "data" },
-      ]), description: "Edge worker is internet-exposed and runs a remotely exploitable deserialization flaw. The instance profile permits connecting to the production payments cluster, creating a complete path from the internet to cardholder data." },
+    { refId: "CL-1042", title: "Public VM with critical RCE vulnerability can reach payments database", severity: "CRITICAL", status: "OPEN", control: "C-1001", resource: byName["prod-api-asg"], attackPathJson: ap([
+        { label: "Internet", sublabel: "0.0.0.0/0 : HTTPS via prod-api-alb", kind: "entry" },
+        { label: "prod-api-asg", sublabel: "CVE-2025-9927 · exploited in the wild · CVSS 9.1", kind: "workload" },
+        { label: "prod-etl-role", sublabel: "over-scoped s3:* and rds access", kind: "identity" },
+        { label: "prod-payments-db", sublabel: "Cardholder records", kind: "data" },
+      ]), description: "The API autoscaling group is internet-exposed through prod-api-alb and runs an exploited-in-the-wild OpenSSL flaw. Its assumed ETL role carries over-scoped database grants, completing a walkable path from the internet to cardholder data." },
     { refId: "CL-1017", title: "Public bucket exposes PII exports", severity: "CRITICAL", status: "OPEN", control: "C-1002", resource: byName["prod-pii-bucket"], attackPathJson: ap([
         { label: "Internet", sublabel: "Anonymous GET allowed", kind: "entry" },
-        { label: "prod-pii-bucket", sublabel: "PII · 214 objects · 38 GB", kind: "data" },
+        { label: "prod-pii-bucket", sublabel: "seeded PII store · anonymous GET", kind: "data" },
       ]), description: "Bucket ACL permits anonymous reads and nightly ETL jobs land classified PII exports inside it. No identity hop is required." },
-    { refId: "CL-1051", title: "Exposed CI runner with docker socket enables supply-chain compromise", severity: "CRITICAL", status: "IN_PROGRESS", control: "C-1006", resource: byName["ci-runner-host"], attackPathJson: ap([
+    { refId: "CL-1051", title: "Exposed CI runner with docker socket enables admin takeover", severity: "CRITICAL", status: "IN_PROGRESS", control: "C-1006", resource: byName["ci-runner-host"], attackPathJson: ap([
         { label: "Internet", sublabel: "0.0.0.0/0 : 2375", kind: "entry" },
         { label: "ci-runner-host", sublabel: "docker.sock mounted", kind: "workload" },
-        { label: "deploy key", sublabel: "org-wide GitHub PAT in env", kind: "identity" },
-        { label: "release pipeline", sublabel: "Signs production images", kind: "impact" },
-      ]), description: "A self-hosted build host advertises its Docker API publicly. Any caller can spawn a privileged container, harvest the org-wide PAT from runner env, and push tampered release images." },
+        { label: "prod-admin-role", sublabel: "break-glass admin, no MFA trail", kind: "identity" },
+        { label: "audit-log-bucket", sublabel: "tamper-evident audit store", kind: "impact" },
+      ]), description: "A self-hosted build host advertises its Docker API publicly. Any caller can spawn a privileged container, assume the break-glass admin role, and tamper with the audit trail that would otherwise record them." },
     { refId: "CL-0998", title: "ETL role with wildcard read on sensitive buckets", severity: "HIGH", status: "OPEN", control: "C-1003", resource: byName["prod-etl-role"], description: "Role policy grants s3:Get* across all buckets including those classified sensitive. Least privilege would scope it to three named buckets." },
     { refId: "CL-0975", title: "KMS key policy trusts an external account", severity: "HIGH", status: "OPEN", control: "C-1004", resource: byName["prod-events-kms"], description: "Key policy statement references principal 210988441277, which no longer maps to any internal account after re-org." },
     { refId: "CL-1033", title: "Authorizer function holds Stripe secret in plaintext env var", severity: "HIGH", status: "OPEN", control: "C-1005", resource: byName["prod-lambda-authorizer"], description: "Live payment secret readable by anyone with lambda:GetFunction. Rotate and move to the secrets manager with KMS encryption." },
@@ -157,8 +157,12 @@ export async function runSeed(): Promise<SeedCounts> {
     E("prod-api-alb", "ROUTES_TO", "checkout-service"),
     E("prod-api-asg", "ACCESSES", "prod-payments-db"),
     E("prod-api-asg", "ASSUMES", "prod-etl-role"),
-    E("edge-ingress-nginx", "ROUTES_TO", "staging-web-ecs"),
+    E("prod-etl-role", "ACCESSES", "prod-payments-db"),
     E("ci-runner-host", "ASSUMES", "prod-admin-role"),
+    E("prod-admin-role", "ACCESSES", "audit-log-bucket"),
+    E("prod-admin-role", "ACCESSES", "prod-pii-bucket"),
+    E("prod-admin-role", "DECRYPTS_WITH", "prod-events-kms"),
+    E("edge-ingress-nginx", "ROUTES_TO", "staging-web-ecs"),
     E("ci-runner-host", "ACCESSES", "audit-log-bucket"),
     E("prod-sgx-worker", "ASSUMES", "prod-etl-role"),
     E("prod-sgx-worker", "EXPOSES", "prod-pii-bucket"),
@@ -178,9 +182,8 @@ export async function runSeed(): Promise<SeedCounts> {
 
   // ---- Simulated cloud activity feed ----
   const h = (n: number) => new Date(Date.now() - n * 60 * 60 * 1000);
-  await db.cloudEvent.createMany({
-    data: [
-      { ts: h(0.4), actor: "deploy-bot@cloudloom", action: "Pushed image sha256:9f2c… to staging-web-ecs", target: "staging-web-ecs", result: "SUCCESS", source: "AWS CloudTrail" },
+  const eventRows = [
+    { ts: h(0.4), actor: "deploy-bot@cloudloom", action: "Pushed image sha256:9f2c… to staging-web-ecs", target: "staging-web-ecs", result: "SUCCESS", source: "AWS CloudTrail" },
       { ts: h(1.1), actor: "iam/user=ops-maria", action: "PutBucketAcl → public-read on prod-pii-bucket", target: "prod-pii-bucket", result: "SUSPICIOUS", source: "AWS CloudTrail" },
       { ts: h(2.3), actor: "system/aws-config", action: "Recorded drift on sg-0af31c (22 added ingress)", target: "prod-sgx-worker", result: "SUCCESS", source: "AWS Config" },
       { ts: h(3.7), actor: "unknown-ip 203.0.113.42", action: "Console sign-in without MFA as break-glass-admin", target: "prod-admin-role", result: "SUSPICIOUS", source: "AWS CloudTrail" },
@@ -192,8 +195,8 @@ export async function runSeed(): Promise<SeedCounts> {
       { ts: h(20.5), actor: "github-actions[bot]", action: "Opened PR OWZPR-4471: bump ingress-nginx 1.9.6 → 1.11.5", target: "edge-ingress-nginx", result: "SUCCESS", source: "GitHub" },
       { ts: h(26.2), actor: "root account", action: "Access key created for emergency use", target: "aws-production", result: "DENIED", source: "AWS CloudTrail" },
       { ts: h(31.8), actor: "sa/vertex-pipeline@ml-prod", action: "iam.roles.assume on storage-admin (unused 90d)", target: "vertex-pipeline-sa", result: "SUSPICIOUS", source: "GCP Audit Logs" },
-    ],
-  });
+  ];
+  await db.cloudEvent.createMany({ data: eventRows });
 
   const vulnSeed: Array<[string, number, string, string, string, string, boolean, string]> = [
     ["CVE-2026-31142", 9.8, "CRITICAL", "libexpat", "2.5.0", "2.6.4", true, "Deserialization flaw in XML entity handling permits remote code execution in processes parsing untrusted input."],
@@ -252,7 +255,7 @@ export async function runSeed(): Promise<SeedCounts> {
     resources: resources.length,
     issues: issuesData.length,
     edges: edges.length,
-    events: 12,
+    events: eventRows.length,
   };
   } finally {
     await db.$disconnect();
