@@ -42,7 +42,7 @@ export default async function IssuesPage() {
   return (
     <div className="mx-auto max-w-6xl p-8">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight text-wiz-navy">Issues</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-loom-navy">Issues</h1>
         <p className="mt-1 text-sm text-slate-500">
           Prioritized risk findings from controls evaluated against the security graph.
           Click a row for details · change status inline.

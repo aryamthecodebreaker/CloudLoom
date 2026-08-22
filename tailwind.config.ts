@@ -5,7 +5,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        wiz: {
+        loom: {
           blue: "#2C6BFF",
           navy: "#0A1633",
           ink: "#101828",

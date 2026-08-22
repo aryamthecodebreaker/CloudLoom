@@ -17,7 +17,7 @@ const nav = [
 export function ConsoleSidebar() {
   const pathname = usePathname();
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-white/10 bg-wiz-navy text-slate-300">
+    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-white/10 bg-loom-navy text-slate-300">
       <div className="border-b border-white/10 px-5 py-5">
         <Link href="/"><Logo dark /></Link>
         <p className="mt-1 pl-8 text-[10px] uppercase tracking-[0.2em] text-slate-500">Demo tenant</p>
@@ -30,7 +30,7 @@ export function ConsoleSidebar() {
               key={n.href}
               href={n.href}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-                active ? "bg-wiz-blue text-white shadow-graph" : "hover:bg-white/5 hover:text-white"
+                active ? "bg-loom-blue text-white shadow-graph" : "hover:bg-white/5 hover:text-white"
               }`}
             >
               <span className="w-4 text-center opacity-80">{n.icon}</span>

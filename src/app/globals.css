@@ -7,19 +7,19 @@
 }
 
 body {
-  @apply bg-white text-wiz-ink antialiased;
+  @apply bg-white text-loom-ink antialiased;
 }
 
-.container-wiz {
+.container-loom {
   @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
 }
 
 .btn-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-wiz-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-wiz-blue focus-visible:ring-offset-2;
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-loom-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-loom-blue focus-visible:ring-offset-2;
 }
 
 .btn-secondary {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-wiz-line bg-white px-5 py-2.5 text-sm font-semibold text-wiz-ink transition hover:border-wiz-blue hover:text-wiz-blue;
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-loom-line bg-white px-5 py-2.5 text-sm font-semibold text-loom-ink transition hover:border-loom-blue hover:text-loom-blue;
 }
 
 .badge {

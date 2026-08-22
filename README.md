@@ -1,11 +1,12 @@
 <div align="center">
 
-# 🪄 OpenWiz
+# 🧶 CloudLoom
 
 **The open-source cloud & AI security platform (CNAPP) — code to cloud to runtime.**
 
-One security graph for your entire stack: discover every resource, surface the attack
-paths an attacker would actually walk, and fix risk at the source.
+CloudLoom weaves every resource, identity, network path, and vulnerability in your
+stack into a single security graph — so you can see the attack paths an attacker
+would actually walk, and cut them at the source.
 
 `Next.js 14` · `TypeScript` · `Tailwind CSS` · `Prisma v5` · `SQLite`
 
@@ -15,9 +16,9 @@ paths an attacker would actually walk, and fix risk at the source.
 
 ---
 
-## ✨ What is OpenWiz?
+## ✨ What is CloudLoom?
 
-OpenWiz is a full-stack, self-contained demo of a modern CNAPP
+CloudLoom is a full-stack, self-contained demo of a modern CNAPP
 (Cloud-Native Application Protection Platform). It ships as two experiences in one app:
 
 | Experience | What you get |
@@ -39,7 +40,7 @@ All demo data is generated and stored locally — **no real cloud accounts are e
 
 ## 🧠 The core idea: one graph, not ten thousand alerts
 
-Traditional scanners produce noise. OpenWiz models the same data as relationships:
+Traditional scanners produce noise. CloudLoom models the same data as relationships:
 
 ```
 Internet ──▶ edge-worker-01 ──▶ etl-role ──▶ pii-exports
@@ -65,8 +66,8 @@ combine into a walkable path. That's what the console is built around.
 
 ```bash
 # 1. Clone & install
-git clone https://github.com/aryamthecodebreaker/OpenWiz.git
-cd OpenWiz
+git clone https://github.com/aryamthecodebreaker/CloudLoom.git
+cd CloudLoom
 npm install
 
 # 2. Configure env

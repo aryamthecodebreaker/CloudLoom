@@ -9,12 +9,12 @@ const links = [
 
 export function SiteNav() {
   return (
-    <header className="sticky top-0 z-40 border-b border-wiz-line bg-white/85 backdrop-blur">
-      <div className="container-wiz flex h-16 items-center justify-between">
-        <Link href="/" aria-label="OpenWiz home"><Logo /></Link>
-        <nav className="hidden items-center gap-7 text-sm font-medium text-wiz-ink md:flex">
+    <header className="sticky top-0 z-40 border-b border-loom-line bg-white/85 backdrop-blur">
+      <div className="container-loom flex h-16 items-center justify-between">
+        <Link href="/" aria-label="CloudLoom home"><Logo /></Link>
+        <nav className="hidden items-center gap-7 text-sm font-medium text-loom-ink md:flex">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="transition hover:text-wiz-blue">
+            <Link key={l.href} href={l.href} className="transition hover:text-loom-blue">
               {l.label}
             </Link>
           ))}
@@ -29,8 +29,8 @@ export function SiteNav() {
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/10 bg-wiz-navy text-slate-300">
-      <div className="container-wiz grid gap-10 py-14 md:grid-cols-4">
+    <footer className="border-t border-white/10 bg-loom-navy text-slate-300">
+      <div className="container-loom grid gap-10 py-14 md:grid-cols-4">
         <div className="space-y-4">
           <Logo dark />
           <p className="max-w-xs text-sm leading-relaxed text-slate-400">
@@ -57,7 +57,7 @@ export function SiteFooter() {
         ))}
       </div>
       <div className="border-t border-white/10 py-5 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} OpenWiz contributors. Demo data only — no live cloud connections.
+        © {new Date().getFullYear()} CloudLoom contributors. Demo data only — no live cloud connections.
       </div>
     </footer>
   );

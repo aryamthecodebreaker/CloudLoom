@@ -24,7 +24,7 @@ export default async function SecurityDashboard() {
     <div className="mx-auto max-w-6xl p-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-wiz-navy">Security Dashboard</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-loom-navy">Security Dashboard</h1>
           <p className="mt-1 text-sm text-slate-500">
             Environment-wide risk at a glance · Last sync {formatDate(accounts[0]?.lastScanAt ?? null)}
           </p>
@@ -42,13 +42,13 @@ export default async function SecurityDashboard() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
         {/* Open issues by severity */}
-        <section className="rounded-2xl border border-wiz-line bg-white p-6 shadow-card lg:col-span-3">
-          <h2 className="font-bold text-wiz-navy">Open issues by severity</h2>
+        <section className="rounded-2xl border border-loom-line bg-white p-6 shadow-card lg:col-span-3">
+          <h2 className="font-bold text-loom-navy">Open issues by severity</h2>
           <div className="mt-5 space-y-4">
             {SEV_ORDER.map((s) => (
               <div key={s} className="flex items-center gap-4">
                 <span className={`badge ${SEVERITY_STYLES[s]} w-28 justify-center`}>{s}</span>
-                <div className="h-6 flex-1 overflow-hidden rounded-md bg-wiz-cloud">
+                <div className="h-6 flex-1 overflow-hidden rounded-md bg-loom-cloud">
                   <div
                     className="h-full rounded-md transition-all"
                     style={{
@@ -57,23 +57,23 @@ export default async function SecurityDashboard() {
                     }}
                   />
                 </div>
-                <span className="w-8 text-right text-sm font-bold text-wiz-navy">{bySeverity[s]}</span>
+                <span className="w-8 text-right text-sm font-bold text-loom-navy">{bySeverity[s]}</span>
               </div>
             ))}
           </div>
-          <Link href="/console/issues?status=OPEN" className="mt-6 inline-block text-sm font-semibold text-wiz-blue hover:underline">
+          <Link href="/console/issues?status=OPEN" className="mt-6 inline-block text-sm font-semibold text-loom-blue hover:underline">
             Triage open issues →
           </Link>
         </section>
 
         {/* Connector health */}
-        <section className="rounded-2xl border border-wiz-line bg-white p-6 shadow-card lg:col-span-2">
-          <h2 className="font-bold text-wiz-navy">Connector health</h2>
+        <section className="rounded-2xl border border-loom-line bg-white p-6 shadow-card lg:col-span-2">
+          <h2 className="font-bold text-loom-navy">Connector health</h2>
           <ul className="mt-4 space-y-3">
             {accounts.map((a) => (
-              <li key={a.id} className="flex items-center justify-between rounded-lg bg-wiz-cloud px-4 py-2.5 text-sm">
+              <li key={a.id} className="flex items-center justify-between rounded-lg bg-loom-cloud px-4 py-2.5 text-sm">
                 <div>
-                  <span className="font-semibold text-wiz-navy">{a.name}</span>
+                  <span className="font-semibold text-loom-navy">{a.name}</span>
                   <span className="ml-2 text-xs uppercase tracking-wide text-slate-400">{a.provider}</span>
                 </div>
                 <span className={`badge ${a.status === "CONNECTED" ? "bg-emerald-100 text-emerald-700" : a.status === "ERROR" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>
@@ -86,26 +86,26 @@ export default async function SecurityDashboard() {
       </div>
 
       {/* Top attack paths */}
-      <section className="mt-8 rounded-2xl border border-wiz-line bg-white p-6 shadow-card">
+      <section className="mt-8 rounded-2xl border border-loom-line bg-white p-6 shadow-card">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-wiz-navy">Top attack paths</h2>
-          <Link href="/console/attack-paths" className="text-sm font-semibold text-wiz-blue hover:underline">All paths →</Link>
+          <h2 className="font-bold text-loom-navy">Top attack paths</h2>
+          <Link href="/console/attack-paths" className="text-sm font-semibold text-loom-blue hover:underline">All paths →</Link>
         </div>
-        <ul className="mt-4 divide-y divide-wiz-line">
+        <ul className="mt-4 divide-y divide-loom-line">
           {criticalPaths.slice(0, 4).map((issue) => {
             const hops = parseAttackPath(issue.attackPathJson);
             return (
               <li key={issue.id}>
                 <Link href="/console/attack-paths" className="group flex items-center gap-4 py-4">
                   <span className={`badge ${SEVERITY_STYLES[issue.severity]} shrink-0`}>{issue.severity}</span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-wiz-navy group-hover:text-wiz-blue">
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-loom-navy group-hover:text-loom-blue">
                     {issue.title}
                   </span>
                   <span className="hidden shrink-0 items-center gap-1 md:flex">
                     {hops.map((h, idx) => (
                       <span key={idx} className="inline-flex items-center gap-1">
-                        {idx > 0 && <span className="text-xs text-wiz-pink">→</span>}
-                        <span className="rounded-md bg-wiz-sky px-2 py-1 text-[11px] font-medium text-wiz-blue">{h.label}</span>
+                        {idx > 0 && <span className="text-xs text-loom-pink">→</span>}
+                        <span className="rounded-md bg-loom-sky px-2 py-1 text-[11px] font-medium text-loom-blue">{h.label}</span>
                       </span>
                     ))}
                   </span>
@@ -125,7 +125,7 @@ export default async function SecurityDashboard() {
 
 function Kpi({ label, value, sub, accent }: { label: string; value: number; sub: string; accent: string }) {
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-wiz-line bg-white p-6 shadow-card">
+    <article className="relative overflow-hidden rounded-2xl border border-loom-line bg-white p-6 shadow-card">
       <span className="absolute inset-x-0 top-0 h-1" style={{ background: accent }} aria-hidden />
       <p className="text-sm font-medium text-slate-500">{label}</p>
       <p className="mt-2 text-4xl font-extrabold tracking-tight" style={{ color: accent }}>{value}</p>

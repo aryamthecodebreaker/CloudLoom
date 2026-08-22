@@ -54,10 +54,10 @@ const tiers = [
 export default function PricingPage() {
   return (
     <>
-      <section className="bg-gradient-to-b from-wiz-cloud to-white py-20 text-center">
-        <div className="container-wiz max-w-2xl">
-          <span className="text-sm font-semibold uppercase tracking-widest text-wiz-blue">Pricing</span>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-wiz-navy md:text-5xl">
+      <section className="bg-gradient-to-b from-loom-cloud to-white py-20 text-center">
+        <div className="container-loom max-w-2xl">
+          <span className="text-sm font-semibold uppercase tracking-widest text-loom-blue">Pricing</span>
+          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-loom-navy md:text-5xl">
             Security that scales with you
           </h1>
           <p className="mt-4 text-lg text-slate-600">
@@ -68,37 +68,37 @@ export default function PricingPage() {
       </section>
 
       <section className="pb-24">
-        <div className="container-wiz grid items-stretch gap-6 lg:grid-cols-3">
+        <div className="container-loom grid items-stretch gap-6 lg:grid-cols-3">
           {tiers.map((t) => (
             <article
               key={t.name}
               className={`relative flex flex-col rounded-3xl border p-9 ${
                 t.featured
-                  ? "border-wiz-blue shadow-graph ring-2 ring-wiz-blue/20"
-                  : "border-wiz-line shadow-card"
+                  ? "border-loom-blue shadow-graph ring-2 ring-loom-blue/20"
+                  : "border-loom-line shadow-card"
               }`}
             >
               {t.featured && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-wiz-pink px-4 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-loom-pink px-4 py-1 text-xs font-bold uppercase tracking-wider text-white">
                   Most popular
                 </span>
               )}
-              <h2 className="text-lg font-bold text-wiz-navy">{t.name}</h2>
+              <h2 className="text-lg font-bold text-loom-navy">{t.name}</h2>
               <p className="mt-4">
-                <span className="text-4xl font-extrabold tracking-tight text-wiz-navy">{t.price}</span>{" "}
+                <span className="text-4xl font-extrabold tracking-tight text-loom-navy">{t.price}</span>{" "}
                 <span className="text-sm text-slate-500">{t.cadence}</span>
               </p>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">{t.blurb}</p>
-              <ul className="mt-7 flex-1 space-y-3 border-t border-wiz-line pt-7">
+              <ul className="mt-7 flex-1 space-y-3 border-t border-loom-line pt-7">
                 {t.features.map((f) => (
                   <li key={f} className="flex gap-2.5 text-sm text-slate-700">
-                    <span className="font-bold text-wiz-blue">✓</span>{f}
+                    <span className="font-bold text-loom-blue">✓</span>{f}
                   </li>
                 ))}
               </ul>
               <button
                 className={`mt-8 rounded-lg px-5 py-3 text-sm font-semibold transition ${
-                  t.featured ? "btn-primary" : "border border-wiz-line hover:border-wiz-blue hover:text-wiz-blue"
+                  t.featured ? "btn-primary" : "border border-loom-line hover:border-loom-blue hover:text-loom-blue"
                 }`}
               >
                 {t.cta}

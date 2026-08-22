@@ -21,7 +21,7 @@ async function main() {
     [
       { name: "aws-production", provider: "AWS", externalId: "482910475620", status: "CONNECTED" },
       { name: "aws-staging", provider: "AWS", externalId: "739104826501", status: "CONNECTED" },
-      { name: "azure-corp", provider: "Azure", externalId: "openwiz-corp-sub", status: "CONNECTED" },
+      { name: "azure-corp", provider: "Azure", externalId: "CloudLoom-corp-sub", status: "CONNECTED" },
       { name: "gcp-ml-platform", provider: "GCP", externalId: "ml-prod-318204", status: "CONNECTED" },
       { name: "k8s-edge-clusters", provider: "Kubernetes", externalId: "edge-fleet", status: "CONNECTED" },
       { name: "oci-archive", provider: "OCI", externalId: "ocid1.tenancy.archive", status: "ERROR" },
@@ -109,31 +109,31 @@ async function main() {
     JSON.stringify(hops);
 
   const issuesData = [
-    { refId: "OWZ-1042", title: "Public VM with critical RCE vulnerability can reach payments database", severity: "CRITICAL", status: "OPEN", control: "C-1001", resource: byName["prod-sgx-worker"], attackPathJson: ap([
+    { refId: "CL-1042", title: "Public VM with critical RCE vulnerability can reach payments database", severity: "CRITICAL", status: "OPEN", control: "C-1001", resource: byName["prod-sgx-worker"], attackPathJson: ap([
         { label: "Internet", sublabel: "0.0.0.0/0 : HTTPS", kind: "entry" },
         { label: "prod-sgx-worker", sublabel: "CVE-2026-31142 · RCE · CVSS 9.8", kind: "workload" },
         { label: "prod-api-asg role", sublabel: "iam:PassRole → rds:Connect", kind: "identity" },
         { label: "prod-payments-db", sublabel: "Cardholder records · 4.2M rows", kind: "data" },
       ]), description: "Edge worker is internet-exposed and runs a remotely exploitable deserialization flaw. The instance profile permits connecting to the production payments cluster, creating a complete path from the internet to cardholder data." },
-    { refId: "OWZ-1017", title: "Public bucket exposes PII exports", severity: "CRITICAL", status: "OPEN", control: "C-1002", resource: byName["prod-pii-bucket"], attackPathJson: ap([
+    { refId: "CL-1017", title: "Public bucket exposes PII exports", severity: "CRITICAL", status: "OPEN", control: "C-1002", resource: byName["prod-pii-bucket"], attackPathJson: ap([
         { label: "Internet", sublabel: "Anonymous GET allowed", kind: "entry" },
         { label: "prod-pii-bucket", sublabel: "PII · 214 objects · 38 GB", kind: "data" },
       ]), description: "Bucket ACL permits anonymous reads and nightly ETL jobs land classified PII exports inside it. No identity hop is required." },
-    { refId: "OWZ-1051", title: "Exposed CI runner with docker socket enables supply-chain compromise", severity: "CRITICAL", status: "IN_PROGRESS", control: "C-1006", resource: byName["ci-runner-host"], attackPathJson: ap([
+    { refId: "CL-1051", title: "Exposed CI runner with docker socket enables supply-chain compromise", severity: "CRITICAL", status: "IN_PROGRESS", control: "C-1006", resource: byName["ci-runner-host"], attackPathJson: ap([
         { label: "Internet", sublabel: "0.0.0.0/0 : 2375", kind: "entry" },
         { label: "ci-runner-host", sublabel: "docker.sock mounted", kind: "workload" },
         { label: "deploy key", sublabel: "org-wide GitHub PAT in env", kind: "identity" },
         { label: "release pipeline", sublabel: "Signs production images", kind: "impact" },
       ]), description: "A self-hosted build host advertises its Docker API publicly. Any caller can spawn a privileged container, harvest the org-wide PAT from runner env, and push tampered release images." },
-    { refId: "OWZ-0998", title: "ETL role with wildcard read on sensitive buckets", severity: "HIGH", status: "OPEN", control: "C-1003", resource: byName["prod-etl-role"], description: "Role policy grants s3:Get* across all buckets including those classified sensitive. Least privilege would scope it to three named buckets." },
-    { refId: "OWZ-0975", title: "KMS key policy trusts an external account", severity: "HIGH", status: "OPEN", control: "C-1004", resource: byName["prod-events-kms"], description: "Key policy statement references principal 210988441277, which no longer maps to any internal account after re-org." },
-    { refId: "OWZ-1033", title: "Authorizer function holds Stripe secret in plaintext env var", severity: "HIGH", status: "OPEN", control: "C-1005", resource: byName["prod-lambda-authorizer"], description: "Live payment secret readable by anyone with lambda:GetFunction. Rotate and move to the secrets manager with KMS encryption." },
-    { refId: "OWZ-1026", title: "Admin port open to the world on corp AD host", severity: "HIGH", status: "IN_PROGRESS", control: "C-1009", resource: byName["corp-ad-vm"], description: "RDP admitted from any source. Restrict to the VPN CIDR and enable session recording." },
-    { refId: "OWZ-1088", title: "Vertex pipeline SA can impersonate storage admin", severity: "HIGH", status: "OPEN", control: "C-1003", resource: byName["vertex-pipeline-sa"], description: "Workload identity carries roles/storage.admin though pipelines only read model artifacts." },
-    { refId: "OWZ-1104", title: "Staging feature store backups unencrypted", severity: "MEDIUM", status: "OPEN", control: "C-1008", resource: byName["staging-feature-store"], description: "Nightly snapshots are written without CMK. Feature vectors are derived from user telemetry and considered internal-confidential." },
-    { refId: "OWZ-1112", title: "Edge ingress controller image two minors behind", severity: "MEDIUM", status: "RESOLVED", control: "C-1007", resource: byName["edge-ingress-nginx"], description: "Controller image lagged the supported patch line. Bumped via pull request OWZPR-4471 and rolled out to all edge clusters." },
-    { refId: "OWZ-1119", title: "Checkout pods automount cloud credentials unused at runtime", severity: "LOW", status: "OPEN", control: "C-1010", resource: byName["checkout-service"], description: "Sensor observed zero API calls using the mounted token over 30 days. Safe to disable automount." },
-    { refId: "OWZ-1121", title: "Audit log bucket lacks object-level immutability", severity: "MEDIUM", status: "REJECTED", control: "C-1002", resource: byName["audit-log-bucket"], description: "Reviewed by security council; retention requirements met via WORM replication to the archive tenancy instead." },
+    { refId: "CL-0998", title: "ETL role with wildcard read on sensitive buckets", severity: "HIGH", status: "OPEN", control: "C-1003", resource: byName["prod-etl-role"], description: "Role policy grants s3:Get* across all buckets including those classified sensitive. Least privilege would scope it to three named buckets." },
+    { refId: "CL-0975", title: "KMS key policy trusts an external account", severity: "HIGH", status: "OPEN", control: "C-1004", resource: byName["prod-events-kms"], description: "Key policy statement references principal 210988441277, which no longer maps to any internal account after re-org." },
+    { refId: "CL-1033", title: "Authorizer function holds Stripe secret in plaintext env var", severity: "HIGH", status: "OPEN", control: "C-1005", resource: byName["prod-lambda-authorizer"], description: "Live payment secret readable by anyone with lambda:GetFunction. Rotate and move to the secrets manager with KMS encryption." },
+    { refId: "CL-1026", title: "Admin port open to the world on corp AD host", severity: "HIGH", status: "IN_PROGRESS", control: "C-1009", resource: byName["corp-ad-vm"], description: "RDP admitted from any source. Restrict to the VPN CIDR and enable session recording." },
+    { refId: "CL-1088", title: "Vertex pipeline SA can impersonate storage admin", severity: "HIGH", status: "OPEN", control: "C-1003", resource: byName["vertex-pipeline-sa"], description: "Workload identity carries roles/storage.admin though pipelines only read model artifacts." },
+    { refId: "CL-1104", title: "Staging feature store backups unencrypted", severity: "MEDIUM", status: "OPEN", control: "C-1008", resource: byName["staging-feature-store"], description: "Nightly snapshots are written without CMK. Feature vectors are derived from user telemetry and considered internal-confidential." },
+    { refId: "CL-1112", title: "Edge ingress controller image two minors behind", severity: "MEDIUM", status: "RESOLVED", control: "C-1007", resource: byName["edge-ingress-nginx"], description: "Controller image lagged the supported patch line. Bumped via pull request CLPR-4471 and rolled out to all edge clusters." },
+    { refId: "CL-1119", title: "Checkout pods automount cloud credentials unused at runtime", severity: "LOW", status: "OPEN", control: "C-1010", resource: byName["checkout-service"], description: "Sensor observed zero API calls using the mounted token over 30 days. Safe to disable automount." },
+    { refId: "CL-1121", title: "Audit log bucket lacks object-level immutability", severity: "MEDIUM", status: "REJECTED", control: "C-1002", resource: byName["audit-log-bucket"], description: "Reviewed by security council; retention requirements met via WORM replication to the archive tenancy instead." },
   ];
 
   for (const i of issuesData) {
@@ -199,7 +199,7 @@ async function main() {
     await db.complianceFramework.create({ data: f });
   }
 
-  console.log("Seeded OpenWiz demo data.");
+  console.log("Seeded CloudLoom demo data.");
 }
 
 main()

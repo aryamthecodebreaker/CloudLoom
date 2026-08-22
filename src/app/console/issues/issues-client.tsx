@@ -59,13 +59,13 @@ export function IssuesClient({ initial }: { initial: Row[] }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search issues, resources, projects…"
-          className="w-72 rounded-lg border border-wiz-line bg-white px-4 py-2 text-sm outline-none focus:border-wiz-blue"
+          className="w-72 rounded-lg border border-loom-line bg-white px-4 py-2 text-sm outline-none focus:border-loom-blue"
         />
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg border border-wiz-line bg-white px-3 py-2 text-sm outline-none focus:border-wiz-blue">
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg border border-loom-line bg-white px-3 py-2 text-sm outline-none focus:border-loom-blue">
           <option value="ALL">All statuses</option>
           {STATUSES.map((s) => <option key={s} value={s}>{s.replace("_", " ")}</option>)}
         </select>
-        <select value={sevFilter} onChange={(e) => setSevFilter(e.target.value)} className="rounded-lg border border-wiz-line bg-white px-3 py-2 text-sm outline-none focus:border-wiz-blue">
+        <select value={sevFilter} onChange={(e) => setSevFilter(e.target.value)} className="rounded-lg border border-loom-line bg-white px-3 py-2 text-sm outline-none focus:border-loom-blue">
           <option value="ALL">All severities</option>
           {SEV_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -76,9 +76,9 @@ export function IssuesClient({ initial }: { initial: Row[] }) {
       </div>
 
       {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-wiz-line bg-white shadow-card">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-loom-line bg-white shadow-card">
         <table className="w-full text-left text-sm">
-          <thead className="bg-wiz-cloud text-xs uppercase tracking-wide text-slate-500">
+          <thead className="bg-loom-cloud text-xs uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-5 py-3.5">Issue</th>
               <th className="px-4 py-3.5">Severity</th>
@@ -87,16 +87,16 @@ export function IssuesClient({ initial }: { initial: Row[] }) {
               <th className="px-4 py-3.5">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-wiz-line">
+          <tbody className="divide-y divide-loom-line">
             {filtered.map((r) => (
               <Fragment key={r.id}>
                 <tr
                   onClick={() => setExpanded(expanded === r.id ? null : r.id)}
-                  className={`cursor-pointer align-top transition hover:bg-wiz-cloud/60 ${expanded === r.id ? "bg-wiz-sky/40" : ""}`}
+                  className={`cursor-pointer align-top transition hover:bg-loom-cloud/60 ${expanded === r.id ? "bg-loom-sky/40" : ""}`}
                 >
                   <td className="max-w-md px-5 py-4">
-                    <p className="flex items-center gap-2 font-semibold text-wiz-navy">
-                      {r.hasPath && <span title="Attack path" className="text-xs text-wiz-pink">⇶</span>}
+                    <p className="flex items-center gap-2 font-semibold text-loom-navy">
+                      {r.hasPath && <span title="Attack path" className="text-xs text-loom-pink">⇶</span>}
                       {r.title}
                     </p>
                     <p className="mt-0.5 text-xs text-slate-400">{r.refId}</p>
@@ -123,7 +123,7 @@ export function IssuesClient({ initial }: { initial: Row[] }) {
                   </td>
                 </tr>
                 {expanded === r.id && (
-                  <tr className="bg-wiz-sky/30">
+                  <tr className="bg-loom-sky/30">
                     <td colSpan={5} className="px-5 py-5">
                       <p className="text-sm leading-relaxed text-slate-700">{r.description}</p>
                       <div className="mt-3 flex flex-wrap gap-x-8 gap-y-1 text-xs text-slate-500">

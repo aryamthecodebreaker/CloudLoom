@@ -35,15 +35,15 @@ const integrations = ["AWS", "Azure", "GCP", "Kubernetes", "OCI", "GitHub", "Git
 export default function PlatformPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-wiz-navy py-24 text-white">
+      <section className="relative overflow-hidden bg-loom-navy py-24 text-white">
         <div className="grain absolute inset-0" aria-hidden />
         <div
           className="absolute -top-32 right-[15%] h-96 w-96 rounded-full opacity-30 blur-3xl"
           style={{ background: "radial-gradient(closest-side, #FF4F9A 0%, transparent)" }}
           aria-hidden
         />
-        <div className="container-wiz relative max-w-3xl">
-          <span className="text-sm font-semibold uppercase tracking-widest text-sky-300">The OpenWiz platform</span>
+        <div className="container-loom relative max-w-3xl">
+          <span className="text-sm font-semibold uppercase tracking-widest text-sky-300">The CloudLoom platform</span>
           <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">Your cloud &amp; AI security HQ</h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-300">
             One graph-powered platform to discover everything running in your clouds,
@@ -54,22 +54,22 @@ export default function PlatformPage() {
       </section>
 
       <section className="py-24">
-        <div className="container-wiz grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="container-loom grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {pillars.map((p) => (
-            <article key={p.name} className="rounded-2xl border border-wiz-line bg-white p-8 shadow-card transition hover:-translate-y-0.5 hover:border-wiz-blue/40">
-              <h2 className="text-lg font-bold text-wiz-navy">{p.name}</h2>
+            <article key={p.name} className="rounded-2xl border border-loom-line bg-white p-8 shadow-card transition hover:-translate-y-0.5 hover:border-loom-blue/40">
+              <h2 className="text-lg font-bold text-loom-navy">{p.name}</h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">{p.body}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="border-y border-wiz-line bg-wiz-cloud py-16">
-        <div className="container-wiz text-center">
-          <h2 className="text-2xl font-extrabold text-wiz-navy">Plays well with your stack</h2>
+      <section className="border-y border-loom-line bg-loom-cloud py-16">
+        <div className="container-loom text-center">
+          <h2 className="text-2xl font-extrabold text-loom-navy">Plays well with your stack</h2>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {integrations.map((i) => (
-              <span key={i} className="rounded-full border border-wiz-line bg-white px-5 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-wiz-blue hover:text-wiz-blue">
+              <span key={i} className="rounded-full border border-loom-line bg-white px-5 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-loom-blue hover:text-loom-blue">
                 {i}
               </span>
             ))}

@@ -3,8 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "OpenWiz — Open-Source Cloud & AI Security",
-    template: "%s | OpenWiz",
+    default: "CloudLoom — Open-Source Cloud & AI Security",
+    template: "%s | CloudLoom",
   },
   description:
     "Open-source CNAPP that connects code, cloud, and runtime into one security graph so teams can find real risk and fix it fast.",

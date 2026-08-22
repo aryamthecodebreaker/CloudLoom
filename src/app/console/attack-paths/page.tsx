@@ -33,7 +33,7 @@ export default async function AttackPathsPage() {
     <div className="mx-auto max-w-6xl p-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-wiz-navy">Attack Paths</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-loom-navy">Attack Paths</h1>
           <p className="mt-1 text-sm text-slate-500">
             Toxic combinations ranked by exploitability — each hop is a place to break the chain.
           </p>
@@ -47,12 +47,12 @@ export default async function AttackPathsPage() {
         {paths.map((issue) => {
           const hops = parseAttackPath(issue.attackPathJson);
           return (
-            <article key={issue.id} className="overflow-hidden rounded-2xl border border-wiz-line bg-white shadow-card">
-              <div className="flex flex-wrap items-center gap-3 border-b border-wiz-line bg-wiz-cloud px-6 py-4">
+            <article key={issue.id} className="overflow-hidden rounded-2xl border border-loom-line bg-white shadow-card">
+              <div className="flex flex-wrap items-center gap-3 border-b border-loom-line bg-loom-cloud px-6 py-4">
                 <span className={`badge ${SEVERITY_STYLES[issue.severity]}`}>{issue.severity}</span>
                 <span className={`badge ${STATUS_STYLES[issue.status]}`}>{issue.status.replace("_", " ")}</span>
-                <h2 className="min-w-0 flex-1 truncate font-semibold text-wiz-navy">{issue.title}</h2>
-                <Link href="/console/issues" className="text-xs font-semibold text-wiz-blue hover:underline">
+                <h2 className="min-w-0 flex-1 truncate font-semibold text-loom-navy">{issue.title}</h2>
+                <Link href="/console/issues" className="text-xs font-semibold text-loom-blue hover:underline">
                   Manage in issues →
                 </Link>
               </div>
@@ -76,7 +76,7 @@ export default async function AttackPathsPage() {
                               {idx + 1}
                             </span>
                             <div className="min-w-0 flex-1 rounded-xl border px-4 py-2.5" style={{ borderColor: `${color}55`, background: `${color}08` }}>
-                              <p className="truncate text-sm font-semibold text-wiz-navy">
+                              <p className="truncate text-sm font-semibold text-loom-navy">
                                 {hop.label}
                                 <span className="ml-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" style={{ background: `${color}18`, color }}>
                                   {KIND_LABELS[hop.kind] ?? hop.kind}
@@ -89,7 +89,7 @@ export default async function AttackPathsPage() {
                       );
                     })}
                   </ol>
-                  <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-wiz-line pt-4">
+                  <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-loom-line pt-4">
                     {[...new Set(hops.map((h) => h.kind))].map((k) => (
                       <span key={k} className="inline-flex items-center gap-1.5 text-xs text-slate-500">
                         <span className="h-2 w-2 rounded-full" style={{ background: KIND_COLORS[k] }} />
@@ -102,15 +102,15 @@ export default async function AttackPathsPage() {
                 {/* Context */}
                 <div className="space-y-4 lg:col-span-2">
                   <p className="text-sm leading-relaxed text-slate-600">{issue.description}</p>
-                  <dl className="rounded-xl bg-wiz-cloud p-4 text-xs leading-relaxed text-slate-600">
+                  <dl className="rounded-xl bg-loom-cloud p-4 text-xs leading-relaxed text-slate-600">
                     <Row k="Resource" v={`${issue.resource.type} · ${issue.resource.name}`} />
                     <Row k="Cloud account" v={`${issue.resource.cloudAccount.provider} · ${issue.resource.cloudAccount.name}`} />
                     <Row k="Project / owner" v={issue.resource.project?.name ?? "—"} />
                     <Row k="Matched control" v={`${issue.control.controlId} — ${issue.control.name}`} />
                     <Row k="Graph query" v={issue.control.queryHint} mono />
                   </dl>
-                  <p className="rounded-lg border border-dashed border-wiz-pink/40 bg-pink-50/60 px-4 py-3 text-xs leading-relaxed text-slate-600">
-                    <strong className="font-semibold text-wiz-pink">Break the first hop:</strong>{" "}
+                  <p className="rounded-lg border border-dashed border-loom-pink/40 bg-pink-50/60 px-4 py-3 text-xs leading-relaxed text-slate-600">
+                    <strong className="font-semibold text-loom-pink">Break the first hop:</strong>{" "}
                     removing internet exposure or fixing{" "}
                     {hops[1]?.label ?? "the entry workload"} collapses this entire path.
                   </p>
@@ -120,7 +120,7 @@ export default async function AttackPathsPage() {
           );
         })}
         {paths.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-wiz-line bg-white py-16 text-center text-sm text-slate-400">
+          <p className="rounded-2xl border border-dashed border-loom-line bg-white py-16 text-center text-sm text-slate-400">
             No attack paths detected in the seeded environment.
           </p>
         )}
