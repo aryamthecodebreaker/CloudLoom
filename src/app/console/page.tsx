@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { ConnectGuide } from "@/components/connect-guide";
-import { SEVERITIES, eventStyle, formatDate, parseAttackPath, severityStyle, statusStyle } from "@/lib/ui";
+import { SEVERITIES, eventStyle, formatDate, parseAttackPath, relTime, severityStyle, statusStyle } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -164,7 +164,7 @@ export default async function SecurityDashboard() {
               <span className="hidden shrink-0 rounded-md bg-cream px-2 py-0.5 text-[11px] font-medium text-slate-500 lg:inline-block">
                 {ev.source}
               </span>
-              <span className="w-24 shrink-0 text-right text-xs text-slate-400">{formatDate(ev.ts)}</span>
+              <span className="w-24 shrink-0 text-right text-xs text-slate-400">{relTime(ev.ts)}</span>
             </li>
           ))}
           {events.length === 0 && (

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { formatDate, parseAttackPath, severityStyle } from "@/lib/ui";
 import { StatusSelect } from "./status-select";
 import { FixButton } from "./fix-button";
+import { CopyLinkButton } from "./copy-link";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,24 @@ export default async function IssueDetailPage({
   });
   if (!issue) notFound();
 
+  // Neighbours in triage order (status → severity → ref), for prev/next navigation
+  const all = await db.issue.findMany({
+    select: { refId: true, status: true, severity: true },
+  });
+  const statusRank: Record<string, number> = { OPEN: 0, IN_PROGRESS: 1, RESOLVED: 2, REJECTED: 3 };
+  const sevRank: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3, INFORMATIONAL: 4 };
+  const ordered = all
+    .sort(
+      (a, b) =>
+        (statusRank[a.status] ?? 9) - (statusRank[b.status] ?? 9) ||
+        (sevRank[a.severity] ?? 9) - (sevRank[b.severity] ?? 9) ||
+        a.refId.localeCompare(b.refId)
+    )
+    .map((i) => i.refId);
+  const idx = ordered.indexOf(issue.refId);
+  const prevRef = idx > 0 ? ordered[idx - 1] : null;
+  const nextRef = idx < ordered.length - 1 ? ordered[idx + 1] : null;
+
   const hops = parseAttackPath(issue.attackPathJson);
 
   return (
@@ -46,7 +65,7 @@ export default async function IssueDetailPage({
           </h1>
         </div>
         <div className="flex flex-col items-end gap-3">
-          <StatusSelect id={issue.id} status={issue.status} />
+          <div className="flex items-center gap-2"><CopyLinkButton /><StatusSelect id={issue.id} status={issue.status} /></div>
           <FixButton issueId={issue.id} refId={issue.refId} />
         </div>
       </header>
@@ -118,7 +137,15 @@ export default async function IssueDetailPage({
         </section>
       )}
 
-      <p className="mt-6 text-xs text-slate-400">Last updated {formatDate(issue.updatedAt)} · simulated finding</p>
+      <nav className="mt-10 flex items-center justify-between border-t border-line pt-5 text-sm">
+        {prevRef ? (
+          <Link href={`/console/issues/${prevRef}`} className="font-semibold text-accent hover:underline">← {prevRef}</Link>
+        ) : <span />}
+        {nextRef ? (
+          <Link href={`/console/issues/${nextRef}`} className="font-semibold text-accent hover:underline">{nextRef} →</Link>
+        ) : <span />}
+      </nav>
+      <p className="mt-4 text-xs text-slate-400">Last updated {formatDate(issue.updatedAt)}</p>
     </div>
   );
 }

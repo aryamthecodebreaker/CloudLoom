@@ -4,6 +4,7 @@ import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from "r
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { STATUSES, severityStyle, statusStyle } from "@/lib/ui";
+import { useToast } from "@/components/toast";
 
 type Row = {
   id: string; refId: string; title: string; description: string;
@@ -27,6 +28,7 @@ export function IssuesClient({
   initialSeverity?: string;
 }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [pending, startTransition] = useTransition();
   const [rows, setRows] = useState(initial);
   const [sevFilter, setSevFilter] = useState(initialSeverity);

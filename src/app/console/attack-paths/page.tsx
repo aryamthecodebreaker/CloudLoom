@@ -20,14 +20,28 @@ const KIND_LABELS: Record<string, string> = {
   impact: "Impact",
 };
 
-export default async function AttackPathsPage() {
+export default async function AttackPathsPage({
+  searchParams,
+}: {
+  searchParams?: { severity?: string; status?: string };
+}) {
   const paths = await db.issue.findMany({
     where: { attackPathJson: { not: null } },
     include: { resource: { include: { cloudAccount: true, project: true } }, control: true },
     orderBy: { refId: "desc" },
   });
 
-  const active = paths.filter((p) => p.status === "OPEN" || p.status === "IN_PROGRESS");
+  const sevFilter = ["CRITICAL", "HIGH", "MEDIUM", "LOW"].includes(searchParams?.severity ?? "")
+    ? searchParams!.severity!
+    : null;
+  const statusFilter = ["OPEN", "IN_PROGRESS", "RESOLVED", "REJECTED"].includes(searchParams?.status ?? "")
+    ? searchParams!.status!
+    : null;
+  const pathsFiltered =
+    sevFilter || statusFilter
+      ? paths.filter((p) => (!sevFilter || p.severity === sevFilter) && (!statusFilter || p.status === statusFilter))
+      : paths;
+  const active = pathsFiltered.filter((p) => p.status === "OPEN" || p.status === "IN_PROGRESS");
 
   return (
     <div className="mx-auto max-w-6xl p-8">
@@ -43,8 +57,37 @@ export default async function AttackPathsPage() {
         </span>
       </header>
 
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <span className="font-mono text-[11px] uppercase tracking-wider text-ink-faint">Filter</span>
+        {["CRITICAL", "HIGH", "MEDIUM"].map((s) => (
+          <Link
+            key={s}
+            href={`/console/attack-paths?severity=${s}${statusFilter ? `&status=${statusFilter}` : ""}`}
+            className={`rounded-full px-3 py-1 font-mono text-[11px] transition-colors ${
+              sevFilter === s ? "bg-ink text-paper" : "border border-line text-ink-faint hover:text-ink"
+            }`}
+          >
+            {s}
+          </Link>
+        ))}
+        {["OPEN", "IN_PROGRESS"].map((st) => (
+          <Link
+            key={st}
+            href={`/console/attack-paths?status=${st}${sevFilter ? `&severity=${sevFilter}` : ""}`}
+            className={`rounded-full px-3 py-1 font-mono text-[11px] transition-colors ${
+              statusFilter === st ? "bg-ink text-paper" : "border border-line text-ink-faint hover:text-ink"
+            }`}
+          >
+            {st.replace("_", " ")}
+          </Link>
+        ))}
+        {(sevFilter || statusFilter) && (
+          <Link href="/console/attack-paths" className="font-mono text-[11px] text-accent hover:underline">clear</Link>
+        )}
+      </div>
+
       <div className="mt-6 space-y-6">
-        {paths.map((issue) => {
+        {pathsFiltered.map((issue) => {
           const hops = parseAttackPath(issue.attackPathJson);
           return (
             <article key={issue.id} className="overflow-hidden rounded-2xl border border-line bg-white shadow-card">
@@ -119,7 +162,7 @@ export default async function AttackPathsPage() {
             </article>
           );
         })}
-        {paths.length === 0 && (
+        {pathsFiltered.length === 0 && (
           <p className="rounded-2xl border border-dashed border-line bg-white py-16 text-center text-sm text-slate-400">
             No attack paths detected in the seeded environment.
           </p>

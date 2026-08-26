@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { csvCell } from "@/lib/csv";
 
 export const dynamic = "force-dynamic";
 
-function csvCell(value: string | number): string {
-  const s = String(value);
-  return /["',\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
 
 export async function GET() {
   const issues = await db.issue.findMany({

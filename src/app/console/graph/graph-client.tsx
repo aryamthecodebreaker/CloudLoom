@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { EDGE_LEGEND, edgeColor, severityStyle, statusStyle } from "@/lib/ui";
+import { matchesAll, parseQuery, type Clause } from "@/lib/graph-query";
 
 export type GraphNode = {
   id: string; name: string; type: string; provider: string; accountName: string;
@@ -23,53 +24,6 @@ const DOT_COLORS: Record<string, string> = {
   CRITICAL: "#D92D20", HIGH: "#F76808", MEDIUM: "#F59E0B", LOW: "#0BA5EC",
 };
 
-// ---- WQL-lite: tiny query language over the graph ----
-type Clause = { key: string; value: string };
-const QUERY_KEYS = ["severity", "exposure", "data", "type", "provider", "region"];
-
-export function parseQuery(q: string): { clauses: Clause[]; error: string | null } {
-  const trimmed = q.trim();
-  if (!trimmed) return { clauses: [], error: null };
-  const clauses: Clause[] = [];
-  for (const part of trimmed.split(/\s+and\s+/i)) {
-    const token = part.trim();
-    const m = token.match(/^(\w+)\s*[:=]\s*(.+)$/);
-    if (!m) {
-      // bare word → substring over name/type
-      clauses.push({ key: "name", value: token.toLowerCase() });
-      continue;
-    }
-    const [, key, value] = m;
-    if (!QUERY_KEYS.includes(key)) {
-      return { clauses: [], error: `Unknown field "${key}" — valid: ${QUERY_KEYS.join(", ")}` };
-    }
-    clauses.push({ key, value: value.toLowerCase().replace(/["']/g, "").trim() });
-  }
-  return { clauses, error: null };
-}
-
-function matchClause(n: GraphNode, { key, value }: Clause): boolean {
-  switch (key) {
-    case "name":
-      return n.name.toLowerCase().includes(value) || n.type.toLowerCase().includes(value);
-    case "severity":
-      if (value === "high+") return n.worstOpenSeverity === "CRITICAL" || n.worstOpenSeverity === "HIGH";
-      return (n.worstOpenSeverity ?? "").toLowerCase() === value;
-    case "exposure":
-      return value === "public" ? n.isPublic : !n.isPublic;
-    case "data":
-      return n.hasSensitiveData === (value === "sensitive" || value === "true");
-    case "type":
-      return n.type.toLowerCase().includes(value);
-    case "provider":
-      return n.provider.toLowerCase() === value;
-    case "region":
-      return n.region.toLowerCase().includes(value);
-    default:
-      return true;
-  }
-}
-
 export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: GraphEdgeInput[] }) {
   const providers = useMemo(() => [...new Set(nodes.map((n) => n.provider))], [nodes]);
   const [activeProviders, setActive] = useState<Set<string>>(new Set(providers));
@@ -86,7 +40,7 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
         nodes
           .filter((n) => activeProviders.has(n.provider))
           .filter((n) => !riskyOnly || n.worstOpenSeverity)
-          .filter((n) => clauses.every((c) => matchClause(n, c)))
+          .filter((n) => matchesAll(n, clauses))
           .map((n) => n.id)
       ),
     [nodes, activeProviders, riskyOnly, clauses]

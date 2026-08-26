@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "./logo";
+import { useToast } from "./toast";
 
 const nav = [
   { href: "/console", label: "Security Dashboard", icon: "▦" },
@@ -20,6 +21,7 @@ const nav = [
 export function ConsoleSidebar({ connected = 0 }: { connected?: number }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { toast } = useToast();
   const [resetting, setResetting] = useState(false);
 
   async function wipeData() {
@@ -29,6 +31,8 @@ export function ConsoleSidebar({ connected = 0 }: { connected?: number }) {
       const res = await fetch("/api/data", { method: "DELETE" });
       if (!res.ok) throw new Error();
       router.refresh();
+    } catch {
+      toast("Wipe failed — try again", "error");
     } finally {
       setResetting(false);
     }
