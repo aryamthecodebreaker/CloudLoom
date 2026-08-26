@@ -17,7 +17,7 @@ const nav = [
   { href: "/console/connectors", label: "Connectors", icon: "⇄" },
 ];
 
-export function ConsoleSidebar() {
+export function ConsoleSidebar({ connected = 0 }: { connected?: number }) {
   const pathname = usePathname();
   const router = useRouter();
   const [resetting, setResetting] = useState(false);
@@ -38,7 +38,11 @@ export function ConsoleSidebar() {
     <aside className="flex h-screen w-16 shrink-0 flex-col border-r border-white/10 bg-coal text-slate-300 lg:w-60">
       <div className="border-b border-white/10 px-5 py-5">
         <Link href="/" aria-label="CloudLoom home"><Logo dark /></Link>
-        <p className="mt-1 hidden text-[10px] uppercase tracking-[0.2em] text-slate-500 lg:block pl-8">Demo tenant</p>
+        <p className="mt-1 hidden pl-8 text-[10px] uppercase tracking-[0.2em] text-slate-500 lg:block">
+          {connected === 0
+            ? "No account connected"
+            : `${connected} account${connected === 1 ? "" : "s"} connected`}
+        </p>
       </div>
       <nav className="dark-scroll flex-1 space-y-1 overflow-y-auto p-3">
         {nav.map((n) => {

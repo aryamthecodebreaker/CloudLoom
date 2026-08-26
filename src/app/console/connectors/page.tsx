@@ -47,8 +47,11 @@ export default async function ConnectorsPage() {
           <li className="flex gap-3">
             <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-ink font-mono text-[11px] font-bold text-paper">1</span>
             <div>
-              <p className="text-sm font-semibold text-coal">Build the agent</p>
-              <pre className="mt-1 overflow-x-auto rounded-md bg-coal p-3 font-mono text-xs text-paper/85"><code>cd agent &amp;&amp; go build -o cloudloom-agent ./cmd/agent</code></pre>
+              <p className="text-sm font-semibold text-coal">Download the agent — one line, no Go needed</p>
+              <pre className="mt-1 overflow-x-auto rounded-md bg-coal p-3 font-mono text-xs text-paper/85"><code>curl -fsSL https://raw.githubusercontent.com/aryamthecodebreaker/CloudLoom/main/scripts/install.sh | sh</code></pre>
+              <p className="mt-1.5 text-xs text-slate-400">
+                Prefer building from source? <code className="rounded bg-mist px-1 font-mono text-[11px]">cd agent &amp;&amp; go build ./cmd/agent</code> — it&apos;s Apache-2.0.
+              </p>
             </div>
           </li>
           <li className="flex gap-3">
