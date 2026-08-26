@@ -37,6 +37,7 @@ export function IssuesClient({
   const [expanded, setExpanded] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<"triage" | "severity" | "updated">("triage");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const PAGE_SIZE = 25;
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -95,10 +96,38 @@ export function IssuesClient({
     });
     if (!res.ok) {
       setRows(prev);
-      alert("Failed to update issue");
+      toast("Failed to update issue", "error");
       return;
     }
     startTransition(() => router.refresh());
+  }
+
+  async function bulkUpdate(status: string) {
+    const ids = [...selected];
+    if (ids.length === 0) return;
+    let ok = 0;
+    for (const id of ids) {
+      try {
+        const res = await fetch(`/api/issues/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        });
+        if (res.ok) {
+          ok++;
+          setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status } : r)));
+        }
+      } catch {
+        /* counted below */
+      }
+    }
+    setSelected(new Set());
+    startTransition(() => router.refresh());
+    if (ok === ids.length) {
+      toast(`${ok} issue${ids.length === 1 ? "" : "s"} → ${status.replace("_", " ").toLowerCase()}`);
+    } else {
+      toast(`${ok} of ${ids.length} updated — some failed`, "error");
+    }
   }
 
   return (
@@ -134,11 +163,45 @@ export function IssuesClient({
           <span className="text-sm font-medium text-slate-500">{sorted.length} of {rows.length}</span>
       </div>
 
+      {selected.size > 0 && (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-ink/20 bg-white px-4 py-2.5">
+          <span className="font-mono text-xs text-ink">{selected.size} selected</span>
+          <button
+            onClick={() => bulkUpdate("RESOLVED")}
+            className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-700"
+          >
+            Resolve selected
+          </button>
+          <button
+            onClick={() => bulkUpdate("REJECTED")}
+            className="rounded-md border border-line px-3 py-1.5 text-xs font-semibold text-slate-500 transition-colors hover:text-ink"
+          >
+            Reject selected
+          </button>
+          <button onClick={() => setSelected(new Set())} className="ml-auto font-mono text-xs text-ink-faint hover:text-ink">
+            clear
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-white shadow-card">
         <table className="w-full text-left text-sm">
           <thead className="sticky top-0 z-10 bg-cream text-xs uppercase tracking-wide text-slate-500">
             <tr>
+              <th className="w-10 px-4 py-3.5">
+                <input
+                  type="checkbox"
+                  aria-label="Select all on page"
+                  checked={paged.length > 0 && paged.every((r) => selected.has(r.id))}
+                  onChange={(e) => {
+                    const next = new Set(selected);
+                    paged.forEach((r) => (e.target.checked ? next.add(r.id) : next.delete(r.id)));
+                    setSelected(next);
+                  }}
+                  className="h-3.5 w-3.5 accent-accent"
+                />
+              </th>
               <th className="px-5 py-3.5">Issue</th>
               <th className="px-4 py-3.5">Severity</th>
               <th className="px-4 py-3.5 hidden lg:table-cell">Control</th>
@@ -153,6 +216,21 @@ export function IssuesClient({
                   onClick={() => setExpanded(expanded === r.id ? null : r.id)}
                   className={`cursor-pointer align-top transition hover:bg-cream/60 ${expanded === r.id ? "bg-mist/40" : ""}`}
                 >
+                  <td className="w-10 px-4 py-4">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${r.refId}`}
+                      checked={selected.has(r.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => {
+                        const next = new Set(selected);
+                        if (e.target.checked) next.add(r.id);
+                        else next.delete(r.id);
+                        setSelected(next);
+                      }}
+                      className="h-3.5 w-3.5 accent-accent"
+                    />
+                  </td>
                   <td className="max-w-md px-5 py-4">
                     <Link
                       href={`/console/issues/${r.refId}`}

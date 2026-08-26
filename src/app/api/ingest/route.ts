@@ -123,13 +123,13 @@ export async function POST(req: NextRequest) {
   });
 
   // Real findings from real resources — built-in controls over the snapshot.
-  const { evaluateSnapshot } = await import("@/lib/evaluate");
-  const findings = await evaluateSnapshot(
-    (body!.resources as import("@/lib/evaluate").IngestResource[]).filter(
-      (r) => typeof r.name === "string" && typeof r.externalId === "string" && r.name && r.externalId
-    ) as import("@/lib/evaluate").IngestResource[],
-    idMap
-  );
+  const { evaluateSnapshot, closeStaleFindings } = await import("@/lib/evaluate");
+  const freshResources = (body!.resources as import("@/lib/evaluate").IngestResource[]).filter(
+    (r) => typeof r.name === "string" && typeof r.externalId === "string" && r.name && r.externalId
+  ) as import("@/lib/evaluate").IngestResource[];
+  const findings = await evaluateSnapshot(freshResources, idMap);
 
-  return NextResponse.json({ ok: true, account: account.name, upserted, skipped: skipped.length, findings });
+  const resolved = await closeStaleFindings(account.id, freshResources, idMap);
+
+  return NextResponse.json({ ok: true, account: account.name, upserted, skipped: skipped.length, findings, resolved });
 }

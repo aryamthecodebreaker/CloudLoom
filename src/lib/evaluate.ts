@@ -133,3 +133,47 @@ export async function nextRefId(): Promise<string> {
   const n = parseInt(max.replace("CL-", ""), 10) || 999;
   return `CL-${n + 1}`;
 }
+
+/**
+ * Re-evaluation pass: for every built-in control, auto-close OPEN findings on
+ * this account whose resource is present in a fresh snapshot but no longer
+ * matches. Resources absent from the snapshot are left for the operator —
+ * absence is ambiguous (deleted vs. permission regression).
+ */
+export async function closeStaleFindings(
+  accountId: string,
+  fresh: IngestResource[],
+  resourceIds: Map<string, string>
+): Promise<number> {
+  await ensureRealControls();
+  let resolved = 0;
+
+  for (const c of REAL_CONTROLS) {
+    const control = await db.control.findUnique({ where: { controlId: c.controlId } });
+    if (!control) continue;
+
+    const open = await db.issue.findMany({
+      where: { controlId: control.id, status: "OPEN", resource: { cloudAccountId: accountId } },
+      include: { resource: { select: { externalId: true, name: true } } },
+    });
+
+    for (const issue of open) {
+      const freshRow = fresh.find((f) => f.externalId === issue.resource.externalId);
+      if (!freshRow || c.match(freshRow)) continue;
+
+      await db.issue.update({ where: { id: issue.id }, data: { status: "RESOLVED" } });
+      await db.cloudEvent.create({
+        data: {
+          ts: new Date(),
+          actor: "system/reevaluation",
+          action: `Auto-closed ${issue.refId} — "${c.name}" no longer matches on re-scan`,
+          target: issue.resource.name,
+          result: "SUCCESS",
+          source: "CloudLoom Agent",
+        },
+      });
+      resolved++;
+    }
+  }
+  return resolved;
+}
