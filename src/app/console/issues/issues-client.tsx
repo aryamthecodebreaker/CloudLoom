@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { STATUSES, severityStyle, statusStyle } from "@/lib/ui";
+import { STATUSES, formatDateTime, severityStyle, statusStyle } from "@/lib/ui";
 import { useToast } from "@/components/toast";
 
 type Row = {
@@ -35,6 +35,9 @@ export function IssuesClient({
   const [statusFilter, setStatusFilter] = useState(initialStatus);
   const [query, setQuery] = useState(initialRef);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState<"triage" | "severity" | "updated">("triage");
+  const PAGE_SIZE = 25;
   const searchRef = useRef<HTMLInputElement>(null);
 
   // Server data changes after router.refresh() (e.g. status updates) — stay in sync
@@ -69,6 +72,18 @@ export function IssuesClient({
       ),
     [rows, sevFilter, statusFilter, query]
   );
+
+  const sorted = useMemo(() => {
+    const sevRank: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3, INFORMATIONAL: 4 };
+    const s = [...filtered];
+    if (sortBy === "severity") s.sort((a, b) => sevRank[a.severity] - sevRank[b.severity]);
+    if (sortBy === "updated") s.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+    return s;
+  }, [filtered, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paged = sorted.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   async function updateStatus(id: string, status: string) {
     const prev = rows;
@@ -111,7 +126,12 @@ export function IssuesClient({
         <span className={`ml-auto text-xs text-slate-400 transition ${pending ? "opacity-100" : "opacity-0"}`}>
           Syncing…
         </span>
-        <span className="text-sm font-medium text-slate-500">{filtered.length} of {rows.length}</span>
+                  <select aria-label="Sort issues" value={sortBy} onChange={(e) => { setSortBy(e.target.value as typeof sortBy); setPage(1); }} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-ink/50">
+            <option value="triage">Sort: triage order</option>
+            <option value="severity">Sort: severity</option>
+            <option value="updated">Sort: recently updated</option>
+          </select>
+          <span className="text-sm font-medium text-slate-500">{sorted.length} of {rows.length}</span>
       </div>
 
       {/* Table */}
@@ -127,7 +147,7 @@ export function IssuesClient({
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {filtered.map((r) => (
+            {paged.map((r) => (
               <Fragment key={r.id}>
                 <tr
                   onClick={() => setExpanded(expanded === r.id ? null : r.id)}
@@ -171,14 +191,14 @@ export function IssuesClient({
                       <p className="text-sm leading-relaxed text-slate-700">{r.description}</p>
                       <div className="mt-3 flex flex-wrap gap-x-8 gap-y-1 text-xs text-slate-500">
                         <span>Resource: <strong className="text-slate-700">{r.resourceType} · {r.resourceName}</strong></span>
-                        <span>Last updated: <strong className="text-slate-700">{new Date(r.updatedAt).toLocaleString()}</strong></span>
+                        <span>Last updated: <strong className="text-slate-700">{formatDateTime(r.updatedAt)}</strong></span>
                       </div>
                     </td>
                   </tr>
                 )}
               </Fragment>
             ))}
-            {filtered.length === 0 && (
+            {sorted.length === 0 && (
               <tr><td colSpan={5} className="px-5 py-10 text-center text-sm text-slate-400">No issues match these filters.</td></tr>
             )}
           </tbody>

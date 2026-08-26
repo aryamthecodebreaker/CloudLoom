@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { EDGE_LEGEND, edgeColor, severityStyle, statusStyle } from "@/lib/ui";
+import { EDGE_LEGEND, edgeColor, severityStyle, STATUS_TEXT, statusStyle } from "@/lib/ui";
 import { matchesAll, parseQuery, type Clause } from "@/lib/graph-query";
 
 export type GraphNode = {
@@ -98,15 +98,17 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
   const isDimmed = (id: string) =>
     !!focusId && focusId !== id && !connections.get(focusId)?.has(id);
 
-  // If filters hide the selected node, drop the stale selection
-  useEffect(() => {
-    if (selectedId && !visible.has(selectedId)) setSelectedId(null);
-  }, [visible, selectedId]);
-
   // ---- Path finder: directed BFS entry → target ----
   const [pathFrom, setPathFrom] = useState("");
   const [pathTo, setPathTo] = useState("");
   const [pathIds, setPathIds] = useState<string[] | null>(null);
+
+  // If filters hide the selected node or a path endpoint, drop stale state
+  useEffect(() => {
+    if (selectedId && !visible.has(selectedId)) setSelectedId(null);
+    if (pathFrom && !visible.has(pathFrom)) { setPathFrom(""); setPathIds(null); }
+    if (pathTo && !visible.has(pathTo)) { setPathTo(""); setPathIds(null); }
+  }, [visible, selectedId, pathFrom, pathTo, pathIds]);
 
   const adjacency = useMemo(() => {
     const m = new Map<string, string[]>();
@@ -390,7 +392,7 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
             <ul className="mt-2 space-y-2">
               {selected.openIssues.map((i) => (
                 <li key={i.refId}>
-                  <Link href="/console/issues" className="block rounded-lg bg-cream px-3 py-2 transition hover:bg-mist">
+                  <Link href={`/console/issues/${i.refId}`} className="block rounded-lg bg-cream px-3 py-2 transition hover:bg-mist">
                     <span className="flex items-center gap-2">
                       <span className={`badge ${severityStyle(i.severity)}`}>{i.severity}</span>
                       <span className="font-mono text-[10px] text-slate-400">{i.refId}</span>
