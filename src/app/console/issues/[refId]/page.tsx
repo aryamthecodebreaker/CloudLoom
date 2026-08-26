@@ -5,6 +5,7 @@ import { formatDate, parseAttackPath, severityStyle } from "@/lib/ui";
 import { StatusSelect } from "./status-select";
 import { FixButton } from "./fix-button";
 import { CopyLinkButton } from "./copy-link";
+import { InvestigateButton } from "./investigate";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,7 @@ export default async function IssueDetailPage({
         </div>
         <div className="flex flex-col items-end gap-3">
           <div className="flex items-center gap-2"><CopyLinkButton /><StatusSelect id={issue.id} status={issue.status} /></div>
+          <InvestigateButton refId={issue.refId} />
           <FixButton issueId={issue.id} refId={issue.refId} />
         </div>
       </header>

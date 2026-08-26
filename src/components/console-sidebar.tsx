@@ -17,6 +17,7 @@ const nav = [
   { href: "/console/vulnerabilities", label: "Vulnerabilities", icon: "◉" },
   { href: "/console/compliance", label: "Compliance", icon: "✓" },
   { href: "/console/connectors", label: "Connectors", icon: "⇄" },
+  { href: "/console/settings", label: "Settings", icon: "⚙" },
 ];
 
 function NavIcon({ href }: { href: string }) {
@@ -32,6 +33,7 @@ function NavIcon({ href }: { href: string }) {
     case "/console/vulnerabilities": return (<svg {...common} {...p}><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="3.5" /><path d="M12 3.5v2M12 18.5v2M20.5 12h-2M3.5 12h2" /></svg>);
     case "/console/compliance": return (<svg {...common} {...p}><circle cx="12" cy="12" r="8.5" /><path d="M8.5 12.5l2.5 2.5 4.5-5" /></svg>);
     case "/console/connectors": return (<svg {...common} {...p}><path d="M7 10h10M7 14h10" /><circle cx="4.5" cy="10" r="1.6" /><circle cx="19.5" cy="14" r="1.6" /></svg>);
+    case "/console/settings": return (<svg {...common} {...p}><circle cx="12" cy="12" r="3" /><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1" /></svg>);
     default: return null;
   }
 }
