@@ -1,7 +1,7 @@
 {
   "name": "cloudloom",
   "version": "0.1.0",
-  "description": "Open-source CNAPP blueprint: security graph, attack paths and issue triage on a realistic simulated multi-cloud estate.",
+  "description": "Open-source CNAPP: security graph, attack paths and issue triage over real multi-cloud discovery.",
   "private": true,
   "repository": {
     "type": "git",

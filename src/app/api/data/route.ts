@@ -13,6 +13,10 @@ export const runtime = "nodejs";
  *
  * Control and ComplianceFramework rows are a shared, idempotently-recreated
  * catalog, not tenant data, so they are deliberately left in place.
+ *
+ * Projects are swept afterwards if nothing references them. No code path
+ * creates a Project or sets Resource.projectId — the model is vestigial and
+ * any surviving rows are residue from the removed seed script.
  */
 export async function DELETE(req: NextRequest) {
   const denied = guardMutation(req);
@@ -44,7 +48,17 @@ export async function DELETE(req: NextRequest) {
       db.resource.deleteMany({ where: { cloudAccountId: { in: accountIds } } }),
       db.cloudAccount.deleteMany({ where: { workspaceId: ctx.workspaceId } }),
     ]);
-    return NextResponse.json({ ok: true, accounts: accountIds.length, resources: resourceIds.length });
+    // Projects carry no workspaceId, so they cannot be scoped. Deleting only
+    // the ones with zero remaining resources is safe under multi-tenancy: a
+    // project no resource points at belongs to nobody.
+    const projects = await db.project.deleteMany({ where: { resources: { none: {} } } });
+
+    return NextResponse.json({
+      ok: true,
+      accounts: accountIds.length,
+      resources: resourceIds.length,
+      projects: projects.count,
+    });
   } catch {
     return NextResponse.json({ ok: false, error: "wipe failed" }, { status: 500 });
   }
