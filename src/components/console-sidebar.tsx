@@ -12,6 +12,7 @@ const nav = [
   { href: "/console/issues", label: "Issues", icon: "⚠" },
   { href: "/console/attack-paths", label: "Attack Paths", icon: "⇶" },
   { href: "/console/identities", label: "Identities", icon: "◈" },
+  { href: "/console/data", label: "Data", icon: "◍" },
   { href: "/console/inventory", label: "Inventory", icon: "☰" },
   { href: "/console/vulnerabilities", label: "Vulnerabilities", icon: "◉" },
   { href: "/console/compliance", label: "Compliance", icon: "✓" },

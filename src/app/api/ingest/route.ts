@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { guardMutation } from "@/lib/guard";
+import type { EventResult } from "@prisma/client";
+import { classifySensitive } from "@/lib/classify";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -59,6 +61,7 @@ export async function POST(req: NextRequest) {
 
   let upserted = 0;
   const skipped: string[] = [];
+  const driftEvents: Array<{ ts: Date; actor: string; action: string; target: string; result: EventResult; source: string }> = [];
   const idMap = new Map<string, string>(); // externalId → resource row id
   for (const raw of body!.resources as import("@/lib/evaluate").IngestResource[]) {
     if (typeof raw.name !== "string" || typeof raw.externalId !== "string" ||
@@ -73,16 +76,27 @@ export async function POST(req: NextRequest) {
       region: typeof raw.region === "string" ? raw.region : "unknown",
       externalId: raw.externalId,
       isPublic: raw.isPublic === true,
-      hasSensitiveData: false, // classification lands with roadmap DSPM work
+      hasSensitiveData: classifySensitive(raw.name),
       cloudAccountId: account.id,
       lastScanAt: new Date(),
     };
     const existing = await db.resource.findFirst({
       where: { externalId: raw.externalId, cloudAccountId: account.id },
-      select: { id: true },
+      select: { id: true, isPublic: true },
     });
     let rowId: string;
     if (existing) {
+      // Exposure drift is a real security signal — log direction changes
+      if (existing.isPublic !== data.isPublic) {
+        driftEvents.push({
+          ts: new Date(),
+          actor: `agent/${prov.toLowerCase()}`,
+          action: `Exposure changed on ${raw.name}: ${existing.isPublic ? "public" : "internal"} → ${data.isPublic ? "public" : "internal"}`,
+          target: raw.name,
+          result: data.isPublic ? "SUSPICIOUS" : "SUCCESS",
+          source: "CloudLoom Agent",
+        });
+      }
       await db.resource.update({ where: { id: existing.id }, data });
       rowId = existing.id;
     } else {
@@ -91,6 +105,10 @@ export async function POST(req: NextRequest) {
     }
     idMap.set(raw.externalId, rowId);
     upserted++;
+  }
+
+  if (driftEvents.length > 0) {
+    await db.cloudEvent.createMany({ data: driftEvents });
   }
 
   await db.cloudEvent.create({

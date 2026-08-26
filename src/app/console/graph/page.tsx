@@ -6,7 +6,11 @@ export const metadata = { title: "Graph Explorer" };
 
 const SEV_RANK: Record<string, number> = { CRITICAL: 4, HIGH: 3, MEDIUM: 2, LOW: 1, INFORMATIONAL: 0 };
 
-export default async function GraphExplorerPage() {
+export default async function GraphExplorerPage({
+  searchParams,
+}: {
+  searchParams?: { q?: string };
+}) {
   const [resources, edges] = await Promise.all([
     db.resource.findMany({
       include: {
@@ -53,7 +57,7 @@ export default async function GraphExplorerPage() {
           </p>
         </div>
       </header>
-      <GraphClient nodes={nodes} edges={edges.map((e) => ({ fromId: e.fromId, kind: e.kind, toId: e.toId }))} />
+      <GraphClient nodes={nodes} edges={edges.map((e) => ({ fromId: e.fromId, kind: e.kind, toId: e.toId }))} initialQuery={searchParams?.q ?? ""} />
     </div>
   );
 }

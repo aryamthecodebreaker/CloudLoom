@@ -24,15 +24,26 @@ const DOT_COLORS: Record<string, string> = {
   CRITICAL: "#D92D20", HIGH: "#F76808", MEDIUM: "#F59E0B", LOW: "#0BA5EC",
 };
 
-export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: GraphEdgeInput[] }) {
+export function GraphClient({ nodes, edges, initialQuery = "" }: { nodes: GraphNode[]; edges: GraphEdgeInput[]; initialQuery?: string }) {
   const providers = useMemo(() => [...new Set(nodes.map((n) => n.provider))], [nodes]);
   const [activeProviders, setActive] = useState<Set<string>>(new Set(providers));
   const [riskyOnly, setRiskyOnly] = useState(false);
-  const [rawQuery, setRawQuery] = useState("");
+  const [rawQuery, setRawQuery] = useState(initialQuery);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
 
   const { clauses, error: queryError } = useMemo(() => parseQuery(rawQuery), [rawQuery]);
+
+  // Shareable queries: keep ?q= in the URL without extra navigations
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const url = new URL(window.location.href);
+      if (rawQuery.trim()) url.searchParams.set("q", rawQuery.trim());
+      else url.searchParams.delete("q");
+      window.history.replaceState(null, "", url.toString());
+    }, 400);
+    return () => clearTimeout(t);
+  }, [rawQuery]);
 
   const visible = useMemo(
     () =>
