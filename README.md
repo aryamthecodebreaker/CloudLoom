@@ -171,9 +171,10 @@ scripts/install.sh            # curl | sh agent installer
 
 - [ ] DSPM heuristics: sensitive-data classification for discovered stores
 - [ ] Graph edges from real IAM role-chaining (currently exposure-derived)
+- [x] Blue Agent investigations (BYO-key, grounded in the graph)
 - [ ] Runtime monitoring via an eBPF sensor
 - [ ] Multi-tenancy, projects & RBAC
-- [ ] AI agents: Red (attack simulation), Blue (auto-investigation), Green (remediation PRs)
+- [ ] AI agents: Red (attack simulation), Green (remediation PRs)
 - [ ] Scheduled re-discovery + drift detection
 
 Contributions welcome — grab anything above or surprise us.

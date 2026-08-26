@@ -3,9 +3,9 @@
 The Go "engine room" of CloudLoom: read-only cloud connectors that will feed
 the security graph the TS core serves.
 
-**Status:** scaffolding. The AWS connector validates configuration, compiles
-with zero external dependencies, and fails honestly — real discovery is
-roadmap item #1 in the root README.
+**Status:** AWS discovery is real (STS + EC2 + S3 + IAM via aws-sdk-go-v2).
+Azure and Kubernetes connectors ship with the same contract; GCP lands next.
+All providers are vetted and tested in CI on every push.
 
 ## Why Go
 
