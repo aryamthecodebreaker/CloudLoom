@@ -108,7 +108,7 @@ $ npm run dev
 
 `}<span className="text-emerald-400">✓ console ready — connect a cloud via the agent</span>{"\n"}<span className="text-white/45">→ http://localhost:3000/console</span></code></pre>
           </div>
-          <p className="mt-3 font-mono text-xs text-ink-faint">No signup. No cloud credentials. Seeded data only.</p>
+          <p className="mt-3 font-mono text-xs text-ink-faint">No signup. No cloud credentials. Your data stays yours.</p>
         </Reveal>
       </section>
 

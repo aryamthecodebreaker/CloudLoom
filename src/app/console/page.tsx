@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { ConnectGuide } from "@/components/connect-guide";
 import { SEVERITIES, eventStyle, formatDate, parseAttackPath, severityStyle, statusStyle } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +45,12 @@ export default async function SecurityDashboard() {
         <Link href="/console/issues" className="btn-secondary">View all issues →</Link>
       </header>
 
+      {accounts.length === 0 ? (
+        <div className="mt-8">
+          <ConnectGuide />
+        </div>
+      ) : (
+      <>
       {/* KPI cards — hierarchy by order and weight, not rainbow strips */}
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi href="/console/issues?status=OPEN" label="Open issues" value={openCount} sub={`${closedCount} closed`} alarm={false} />
@@ -138,6 +145,8 @@ export default async function SecurityDashboard() {
         </ul>
       </section>
 
+      </>
+      )}
       {/* Recent cloud activity */}
       <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
         <div className="flex items-center justify-between">
