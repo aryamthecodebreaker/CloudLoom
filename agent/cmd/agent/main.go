@@ -1,7 +1,8 @@
 // Command agent is CloudLoom's read-only cloud connector.
 //
 // Discover resources in one real cloud account, then either print them as
-// JSON (default) or push them straight into a CloudLoom instance's graph:
+// JSON (default), push them straight into a CloudLoom instance's graph, or
+// run continuously as a scanning daemon:
 //
 //	# discover and print
 //	cloudloom-agent -provider aws -account 482910475620
@@ -11,7 +12,11 @@
 //	CLOUDLOOM_PUSH_TOKEN=<INGEST_TOKEN> \
 //	cloudloom-agent -provider aws -account 482910475620 -push
 //
+//	# daemon: re-discover and push every 6 hours (drift detection)
+//	cloudloom-agent -provider aws -account 482910475620 -push -interval 6h
+//
 // Exit codes: 2 bad configuration · 3 discovery failed · 4 push failed.
+// In daemon mode a failed cycle logs and retries on the next interval.
 package main
 
 import (
@@ -25,8 +30,8 @@ import (
 	"time"
 
 	"github.com/aryamthecodebreaker/CloudLoom/agent/internal/aws"
-"github.com/aryamthecodebreaker/CloudLoom/agent/internal/azure"
-"github.com/aryamthecodebreaker/CloudLoom/agent/internal/kubernetes"
+	"github.com/aryamthecodebreaker/CloudLoom/agent/internal/azure"
+	"github.com/aryamthecodebreaker/CloudLoom/agent/internal/kubernetes"
 	"github.com/aryamthecodebreaker/CloudLoom/agent/internal/provider"
 )
 
@@ -38,6 +43,7 @@ func main() {
 		sub        = flag.String("subscription", os.Getenv("CLOUDLOOM_AZURE_SUBSCRIPTION"), "Azure subscription UUID")
 		kubeCtx    = flag.String("kube-context", os.Getenv("CLOUDLOOM_KUBE_CONTEXT"), "kubeconfig context (empty = current)")
 		push       = flag.Bool("push", false, "push the snapshot to CLOUDLOOM_PUSH_URL instead of printing")
+		interval   = flag.Duration("interval", 0, "continuous mode: re-discover every interval (e.g. 6h). 0 = run once")
 		timeoutSec = flag.Int("timeout", 120, "discovery timeout in seconds")
 	)
 	flag.Parse()
@@ -70,29 +76,45 @@ func main() {
 	}
 	defer prov.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSec)*time.Second)
-	defer cancel()
-
-	snap, err := prov.Discover(ctx)
-	if err != nil {
-		exit(3, err)
-	}
-
-	if *push {
+	runOnce := func(ctx context.Context) error {
+		snap, err := prov.Discover(ctx)
+		if err != nil {
+			return err
+		}
+		if !*push {
+			out, _ := json.MarshalIndent(snap, "", "  ")
+			fmt.Println(string(out))
+			return nil
+		}
 		url := os.Getenv("CLOUDLOOM_PUSH_URL")
 		token := os.Getenv("CLOUDLOOM_PUSH_TOKEN")
 		if url == "" || token == "" {
-			exit(2, fmt.Errorf("push requires CLOUDLOOM_PUSH_URL and CLOUDLOOM_PUSH_TOKEN"))
+			return fmt.Errorf("push requires CLOUDLOOM_PUSH_URL and CLOUDLOOM_PUSH_TOKEN")
 		}
 		if err := pushSnapshot(ctx, url, token, snap); err != nil {
-			exit(4, err)
+			return err
 		}
 		fmt.Printf("pushed %d resources from %s/%s to %s\n", len(snap.Resources), snap.Provider, snap.AccountID, url)
-		return
+		return nil
 	}
 
-	out, _ := json.MarshalIndent(snap, "", "  ")
-	fmt.Println(string(out))
+	if *interval > 0 {
+		fmt.Printf("daemon mode: discovering every %s (ctrl-c to stop)\n", *interval)
+		for {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSec)*time.Second)
+			if err := runOnce(ctx); err != nil {
+				fmt.Fprintf(os.Stderr, "cloudloom-agent: cycle failed: %v\n", err)
+			}
+			cancel()
+			time.Sleep(*interval)
+		}
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSec)*time.Second)
+	defer cancel()
+	if err := runOnce(ctx); err != nil {
+		exit(3, err)
+	}
 }
 
 func pushSnapshot(ctx context.Context, base, token string, snap provider.Snapshot) error {
@@ -126,4 +148,3 @@ func envOr(key, fallback string) string {
 	}
 	return fallback
 }
-

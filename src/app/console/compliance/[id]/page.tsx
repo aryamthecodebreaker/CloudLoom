@@ -43,13 +43,16 @@ export default async function FrameworkDetailPage({
             computed live from open findings
           </p>
         </div>
-        <span className={`badge px-3 py-1.5 ${
-          controls.length === 0 ? "bg-stone-100 text-stone-500"
-          : failing.length === 0 ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
-          : "bg-orange-50 text-orange-600 ring-1 ring-orange-200"
-        }`}>
-          {controls.length === 0 ? "PENDING" : failing.length === 0 ? "PASSING" : `${failing.length} FAILING`}
-        </span>
+        <div className="flex items-center gap-2">
+          <a href={`/api/compliance/${framework.id}/export`} className="rounded-md border border-line px-3 py-1.5 text-xs font-semibold text-slate-500 transition-colors hover:border-ink/40 hover:text-ink">Export evidence (CSV)</a>
+          <span className={`badge px-3 py-1.5 ${
+            controls.length === 0 ? "bg-stone-100 text-stone-500"
+            : failing.length === 0 ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
+            : "bg-orange-50 text-orange-600 ring-1 ring-orange-200"
+          }`}>
+            {controls.length === 0 ? "PENDING" : failing.length === 0 ? "PASSING" : `${failing.length} FAILING`}
+          </span>
+        </div>
       </header>
 
       {controls.length === 0 ? (

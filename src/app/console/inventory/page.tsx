@@ -78,7 +78,7 @@ export default async function InventoryPage({
         {filtered && (
           <Link href="/console/inventory" className="text-sm font-semibold text-accent hover:underline">Clear</Link>
         )}
-        <span className="ml-auto font-mono text-xs text-slate-400">
+        <a href="/api/inventory/export" className="mr-3 text-xs font-semibold text-accent hover:underline">Export CSV</a><span className="ml-auto font-mono text-xs text-slate-400">
           {resources.length} of {allResources.length}
         </span>
       </form>

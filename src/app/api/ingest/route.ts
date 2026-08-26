@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { guardMutation } from "@/lib/guard";
 import type { EventResult } from "@prisma/client";
+import { notify } from "@/lib/notify";
 import { classifySensitive } from "@/lib/classify";
 
 export const dynamic = "force-dynamic";
@@ -109,6 +110,11 @@ export async function POST(req: NextRequest) {
 
   if (driftEvents.length > 0) {
     await db.cloudEvent.createMany({ data: driftEvents });
+    for (const d of driftEvents) {
+      if (d.result === "SUSPICIOUS") {
+        await notify(`:rotating_light: CloudLoom — ${d.action} (${d.actor})`);
+      }
+    }
   }
 
   await db.cloudEvent.create({
@@ -128,6 +134,16 @@ export async function POST(req: NextRequest) {
     (r) => typeof r.name === "string" && typeof r.externalId === "string" && r.name && r.externalId
   ) as import("@/lib/evaluate").IngestResource[];
   const findings = await evaluateSnapshot(freshResources, idMap);
+  if (findings > 0) {
+    const criticals = await db.issue.count({
+      where: { status: "OPEN", severity: "CRITICAL", resource: { cloudAccountId: account.id } },
+    });
+    if (criticals > 0) {
+      await notify(
+        `:rotating_light: CloudLoom — ${findings} new finding(s) in ${accountName}, including ${criticals} CRITICAL. <${process.env.NEXT_PUBLIC_APP_URL ?? "https://trycloudloom.vercel.app"}/console/issues|Open triage>`
+      );
+    }
+  }
 
   const resolved = await closeStaleFindings(account.id, freshResources, idMap);
 
