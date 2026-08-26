@@ -10,7 +10,7 @@ would actually walk, and cut them at the source.
 
 `Next.js 14` · `TypeScript` · `Go` · `Tailwind CSS` · `Prisma v5` · `Postgres`
 
-[**🚀 Live console**](https://trycloudloom.vercel.app/console) · [**⭐ Repository**](https://github.com/aryamthecodebreaker/CloudLoom) · [**📦 Quickstart**](#-quickstart) · [**🔌 Connect a cloud**](#-connect-a-real-cloud-account) · [Contributing](#-contributing)
+[**🚀 Try it**](https://trycloudloom.vercel.app/register) · [**⭐ Repository**](https://github.com/aryamthecodebreaker/CloudLoom) · [**📦 Quickstart**](#-quickstart) · [**🔌 Connect a cloud**](#-connect-a-real-cloud-account) · [Contributing](#-contributing)
 
 [![CI](https://github.com/aryamthecodebreaker/CloudLoom/actions/workflows/ci.yml/badge.svg)](./.github/workflows/ci.yml)
 [![Agent](https://github.com/aryamthecodebreaker/CloudLoom/actions/workflows/agent.yml/badge.svg)](./.github/workflows/agent.yml)
@@ -30,10 +30,12 @@ discovery**. It ships as two experiences in one app:
 | Experience | What you get |
 |---|---|
 | 🌐 **Marketing site** (`/`) | Landing page and platform overview — the public face |
-| 🛡️ **Security console** (`/console`) | A working CNAPP: graph, triage, compliance — populated by the agent from YOUR clouds |
+| 🛡️ **Security console** (`/console`) | A working CNAPP: graph, triage, compliance — populated by the agent from YOUR clouds. Sign-in required; each account gets its own workspace |
 
 **No seed data. No demo mode.** The console starts empty and fills only with
-what the agent discovers in accounts you connect.
+what the agent discovers in accounts you connect. There is no public demo
+tenant to browse — [register](https://trycloudloom.vercel.app/register), then
+point the agent at a cloud account you own.
 
 ### 🎯 Status: what CloudLoom is today
 
@@ -44,14 +46,15 @@ what the agent discovers in accounts you connect.
 - **Render the security graph** — interactive explorer with typed edges, path finding (BFS), and a WQL-lite query language (`severity=critical and exposure=public`)
 - **Triage end-to-end** — status workflow persisted to Postgres, detail pages, prev/next flow, CSV export, shareable filter URLs
 - **Report compliance live** — framework posture computed from real controls, with per-control evidence drill-down
-- **Stay honest** — DB-level enums, same-origin write guards, bearer-token ingestion, CI (lint + typecheck + tests + build), multi-platform release binaries
+- **Isolate tenants** — email/password auth (NextAuth v5), one workspace per account with OWNER/ADMIN/MEMBER/VIEWER roles, and every console page and API route scoped to the caller's workspace
+- **Stay honest** — DB-level enums, CSRF write guards, session-gated APIs, per-workspace bearer tokens for ingestion, CI (lint + typecheck + tests + build), multi-platform release binaries
 
 **It does not (yet):**
 
 - Classify sensitive data automatically (DSPM heuristics are next)
 - Monitor runtime (eBPF sensor is scaffolded in the roadmap)
-- Run the Red/Blue/Green AI agents (designed, not built)
-- Provide multi-tenancy/RBAC
+- Run the Red/Green AI agents (designed, not built — Blue ships today)
+- Invite teammates into a workspace (roles exist; invite flow does not)
 
 ## 🧠 The core idea: one graph, not ten thousand alerts
 
@@ -91,11 +94,28 @@ npm run db:push
 
 # 4. Launch
 npm run dev                   # marketing site at http://localhost:3000
+                              # register at http://localhost:3000/register
                               # console at http://localhost:3000/console
 ```
 
 Need an instant free Postgres? [Supabase](https://supabase.com) or
 [Neon](https://neon.tech) — copy the connection string into `DATABASE_URL`.
+
+The first account you register owns the deployment.
+
+### Upgrading a pre-workspace deployment
+
+If your database was ingesting data before workspaces existed, its cloud
+accounts and events belong to no workspace. Adopt them **before** pushing the
+schema, or the `NOT NULL` constraints have nothing to point at:
+
+```bash
+node scripts/bootstrap-workspace.mjs   # moves orphaned rows into "Default"
+npm run db:push
+```
+
+The first account you register then inherits that workspace as OWNER, so your
+existing graph shows up instead of being stranded.
 
 ## 🔌 Connect a real cloud account
 
@@ -173,7 +193,8 @@ scripts/install.sh            # curl | sh agent installer
 - [ ] Graph edges from real IAM role-chaining (currently exposure-derived)
 - [x] Blue Agent investigations (BYO-key, grounded in the graph)
 - [ ] Runtime monitoring via an eBPF sensor
-- [ ] Multi-tenancy, projects & RBAC
+- [x] Multi-tenancy: workspaces, roles & per-workspace ingestion tokens
+- [ ] Workspace member invitations
 - [ ] AI agents: Red (attack simulation), Green (remediation PRs)
 - [ ] Scheduled re-discovery + drift detection
 

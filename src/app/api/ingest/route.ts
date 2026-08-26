@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const resolved = await closeStaleFindings(account.id, freshResources, idMap);
+  const resolved = await closeStaleFindings(account.id, freshResources, idMap, workspaceId);
 
   return NextResponse.json({ ok: true, account: account.name, upserted, skipped: skipped.length, findings, resolved });
 }

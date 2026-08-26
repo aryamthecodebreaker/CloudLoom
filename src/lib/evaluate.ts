@@ -143,7 +143,8 @@ export async function nextRefId(): Promise<string> {
 export async function closeStaleFindings(
   accountId: string,
   fresh: IngestResource[],
-  resourceIds: Map<string, string>
+  resourceIds: Map<string, string>,
+  workspaceId: string
 ): Promise<number> {
   await ensureRealControls();
   let resolved = 0;
@@ -170,6 +171,7 @@ export async function closeStaleFindings(
           target: issue.resource.name,
           result: "SUCCESS",
           source: "CloudLoom Agent",
+          workspaceId,
         },
       });
       resolved++;

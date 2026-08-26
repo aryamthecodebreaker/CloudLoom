@@ -37,8 +37,8 @@ model CloudAccount {
   lastScanAt  DateTime?
   resources   Resource[]
   createdAt   DateTime   @default(now())
-  workspaceId String?
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([provider, externalId, workspaceId])
   @@index([workspaceId])
@@ -191,8 +191,8 @@ model CloudEvent {
   target String
   result      EventResult
   source String
-  workspaceId String?
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([ts])
   @@index([workspaceId])

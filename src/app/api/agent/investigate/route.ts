@@ -107,6 +107,7 @@ export async function POST(req: NextRequest) {
       target: issue.refId,
       result: "SUCCESS",
       source: "CloudLoom Agent",
+      workspaceId: ctx.workspaceId,
     },
   });
 
