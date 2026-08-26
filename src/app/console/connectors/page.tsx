@@ -35,6 +35,43 @@ export default async function ConnectorsPage() {
         ))}
       </ol>
 
+      {/* Real account onboarding — the agent flow */}
+      <section className="mt-8 rounded-md border border-line bg-white p-6 shadow-card">
+        <h2 className="font-bold text-coal">Connect a real account</h2>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-500">
+          The CloudLoom agent runs <strong>on your machine</strong> with read-only
+          credentials you already have. Your keys never leave your environment —
+          only resource metadata is pushed to this graph.
+        </p>
+        <ol className="mt-5 space-y-4">
+          <li className="flex gap-3">
+            <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-ink font-mono text-[11px] font-bold text-paper">1</span>
+            <div>
+              <p className="text-sm font-semibold text-coal">Build the agent</p>
+              <pre className="mt-1 overflow-x-auto rounded-md bg-coal p-3 font-mono text-xs text-paper/85"><code>cd agent &amp;&amp; go build -o cloudloom-agent ./cmd/agent</code></pre>
+            </div>
+          </li>
+          <li className="flex gap-3">
+            <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-ink font-mono text-[11px] font-bold text-paper">2</span>
+            <div>
+              <p className="text-sm font-semibold text-coal">Preview what it finds (nothing is sent)</p>
+              <pre className="mt-1 overflow-x-auto rounded-md bg-coal p-3 font-mono text-xs text-paper/85"><code>./cloudloom-agent -provider aws -account 123456789012</code></pre>
+            </div>
+          </li>
+          <li className="flex gap-3">
+            <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-ink font-mono text-[11px] font-bold text-paper">3</span>
+            <div>
+              <p className="text-sm font-semibold text-coal">Push into this graph</p>
+              <pre className="mt-1 overflow-x-auto rounded-md bg-coal p-3 font-mono text-xs text-paper/85"><code>{`export CLOUDLOOM_PUSH_URL=https://trycloudloom.vercel.app
+export CLOUDLOOM_PUSH_TOKEN=<INGEST_TOKEN>
+./cloudloom-agent -provider aws -account 123456789012 -push`}</code></pre>
+              <p className="mt-1.5 text-xs text-slate-400">
+                Built-in controls then evaluate your real resources into open issues automatically.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
       <div className="mt-8 overflow-hidden rounded-2xl border border-line bg-white shadow-card">
         <table className="w-full text-left text-sm">
           <thead className="bg-cream text-xs uppercase tracking-wide text-slate-500">

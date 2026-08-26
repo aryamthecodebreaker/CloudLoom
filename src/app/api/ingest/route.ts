@@ -5,7 +5,8 @@ import { guardMutation } from "@/lib/guard";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-type IngestResource = {
+/* eslint-disable @typescript-eslint/no-unused-vars */
+type RouteResource = {
   name?: unknown; type?: unknown; region?: unknown;
   externalId?: unknown; isPublic?: unknown; hasSensitiveData?: unknown;
 };
@@ -63,7 +64,8 @@ export async function POST(req: NextRequest) {
 
   let upserted = 0;
   const skipped: string[] = [];
-  for (const raw of body!.resources as IngestResource[]) {
+  const idMap = new Map<string, string>(); // externalId → resource row id
+  for (const raw of body!.resources as import("@/lib/evaluate").IngestResource[]) {
     if (typeof raw.name !== "string" || typeof raw.externalId !== "string" ||
         raw.name === "" || raw.externalId === "") {
       skipped.push(String(raw.name ?? "<unnamed>"));
@@ -84,11 +86,15 @@ export async function POST(req: NextRequest) {
       where: { externalId: raw.externalId, cloudAccountId: account.id },
       select: { id: true },
     });
+    let rowId: string;
     if (existing) {
       await db.resource.update({ where: { id: existing.id }, data });
+      rowId = existing.id;
     } else {
-      await db.resource.create({ data });
+      const createdRow = await db.resource.create({ data, select: { id: true } });
+      rowId = createdRow.id;
     }
+    idMap.set(raw.externalId, rowId);
     upserted++;
   }
 
@@ -103,5 +109,14 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return NextResponse.json({ ok: true, account: account.name, upserted, skipped: skipped.length });
+  // Real findings from real resources — built-in controls over the snapshot.
+  const { evaluateSnapshot } = await import("@/lib/evaluate");
+  const findings = await evaluateSnapshot(
+    (body!.resources as import("@/lib/evaluate").IngestResource[]).filter(
+      (r) => typeof r.name === "string" && typeof r.externalId === "string" && r.name && r.externalId
+    ) as import("@/lib/evaluate").IngestResource[],
+    idMap
+  );
+
+  return NextResponse.json({ ok: true, account: account.name, upserted, skipped: skipped.length, findings });
 }

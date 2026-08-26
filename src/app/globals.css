@@ -79,3 +79,22 @@ kbd {
     stroke-dashoffset: 0;
   }
 }
+
+/* Dark, unobtrusive scrollbars inside dark chrome (sidebar, terminals) */
+.dark-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+.dark-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.dark-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dark-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+.dark-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

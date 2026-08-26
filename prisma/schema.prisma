@@ -73,7 +73,7 @@ model Resource {
 
 model Control {
   id          String  @id @default(cuid())
-  controlId   String
+  controlId   String  @unique
   name        String
   description String
   category    String

@@ -40,7 +40,7 @@ export function ConsoleSidebar() {
         <Link href="/" aria-label="CloudLoom home"><Logo dark /></Link>
         <p className="mt-1 hidden text-[10px] uppercase tracking-[0.2em] text-slate-500 lg:block pl-8">Demo tenant</p>
       </div>
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+      <nav className="dark-scroll flex-1 space-y-1 overflow-y-auto p-3">
         {nav.map((n) => {
           const active = n.href === "/console" ? pathname === "/console" : pathname.startsWith(n.href);
           return (
