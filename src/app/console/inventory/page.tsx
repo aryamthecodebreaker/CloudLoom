@@ -99,7 +99,7 @@ export default async function InventoryPage({
             {resources.map((r) => (
               <tr key={r.id} className="transition hover:bg-mist/60">
                 <td className="px-5 py-3.5">
-                  <p className="font-semibold text-coal">{r.name}</p>
+                  <Link href={`/console/resources/${r.id}`} className="font-semibold text-coal hover:text-accent hover:underline">{r.name}</Link>
                   <p className="font-mono text-[10px] text-slate-400">{r.externalId}</p>
                 </td>
                 <td className="px-4 py-3.5 text-slate-600">{r.type}</td>
