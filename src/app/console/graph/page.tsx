@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { requireWorkspace, accountScope, edgeScope } from "@/lib/rbac";
 import { GraphClient } from "./graph-client";
 
 export const dynamic = "force-dynamic";
@@ -11,8 +12,10 @@ export default async function GraphExplorerPage({
 }: {
   searchParams?: { q?: string };
 }) {
+  const ws = await requireWorkspace();
   const [resources, edges] = await Promise.all([
     db.resource.findMany({
+      where: accountScope(ws),
       include: {
         cloudAccount: true,
         project: true,
@@ -20,7 +23,7 @@ export default async function GraphExplorerPage({
         _count: { select: { vulnerabilities: true, edgesOut: true, edgesIn: true } },
       },
     }),
-    db.graphEdge.findMany(),
+    db.graphEdge.findMany({ where: edgeScope(ws) }),
   ]);
 
   const nodes = resources.map((r) => {

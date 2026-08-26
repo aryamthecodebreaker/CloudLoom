@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireWorkspace, accountScope } from "@/lib/rbac";
 import { PROVIDER_LABELS } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
@@ -13,8 +14,10 @@ export default async function InventoryPage({
   searchParams?: SearchParams;
 }) {
   const sp = searchParams ?? {};
+  const ws = await requireWorkspace();
   const [allResources, accounts] = await Promise.all([
     db.resource.findMany({
+      where: accountScope(ws),
       include: {
         cloudAccount: true,
         project: true,
@@ -22,7 +25,7 @@ export default async function InventoryPage({
       },
       orderBy: [{ provider: "asc" }, { name: "asc" }],
     }),
-    db.cloudAccount.findMany(),
+    db.cloudAccount.findMany({ where: { workspaceId: ws.workspaceId } }),
   ]);
 
   const providers = [...new Set(allResources.map((r) => r.provider))].sort();

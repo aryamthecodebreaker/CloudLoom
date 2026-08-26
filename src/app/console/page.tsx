@@ -1,25 +1,41 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireWorkspace, accountScope, resourceScope } from "@/lib/rbac";
 import { ConnectGuide } from "@/components/connect-guide";
 import { SEVERITIES, eventStyle, formatDate, parseAttackPath, relTime, severityStyle, statusStyle } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function SecurityDashboard() {
+  const ws = await requireWorkspace();
+  const issueScope = resourceScope(ws);
   const [severityGroups, openCount, closedCount, accounts, resources, kevCount, criticalPaths, events] =
     await Promise.all([
-      db.issue.groupBy({ by: ["severity"], where: { status: "OPEN" }, _count: { _all: true } }),
-      db.issue.count({ where: { status: "OPEN" } }),
-      db.issue.count({ where: { status: { notIn: ["OPEN"] } } }),
-      db.cloudAccount.findMany(),
-      db.resource.count(),
-      db.vulnerability.count({ where: { exploitedInWild: true } }),
+      db.issue.groupBy({
+        by: ["severity"],
+        where: { AND: [{ status: "OPEN" }, issueScope] },
+        _count: { _all: true },
+      }),
+      db.issue.count({ where: { AND: [{ status: "OPEN" }, issueScope] } }),
+      db.issue.count({ where: { AND: [{ status: { notIn: ["OPEN"] } }, issueScope] } }),
+      db.cloudAccount.findMany({ where: { workspaceId: ws.workspaceId } }),
+      db.resource.count({ where: accountScope(ws) }),
+      db.vulnerability.count({ where: { AND: [{ exploitedInWild: true }, issueScope] } }),
       db.issue.findMany({
-        where: { attackPathJson: { not: null }, status: { in: ["OPEN", "IN_PROGRESS"] } },
+        where: {
+          AND: [
+            { attackPathJson: { not: null }, status: { in: ["OPEN", "IN_PROGRESS"] } },
+            issueScope,
+          ],
+        },
         orderBy: { refId: "desc" },
         take: 4,
       }),
-      db.cloudEvent.findMany({ orderBy: { ts: "desc" }, take: 6 }),
+      db.cloudEvent.findMany({
+        where: { workspaceId: ws.workspaceId },
+        orderBy: { ts: "desc" },
+        take: 6,
+      }),
     ]);
 
   const bySeverity = Object.fromEntries(

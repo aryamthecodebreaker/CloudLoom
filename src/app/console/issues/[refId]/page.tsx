@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { requireWorkspace, resourceScope } from "@/lib/rbac";
 import { formatDate, parseAttackPath, severityStyle } from "@/lib/ui";
 import { StatusSelect } from "./status-select";
 import { FixButton } from "./fix-button";
@@ -19,8 +20,9 @@ export default async function IssueDetailPage({
 }: {
   params: { refId: string };
 }) {
+  const ws = await requireWorkspace();
   const issue = await db.issue.findFirst({
-    where: { refId: params.refId.toUpperCase() },
+    where: { AND: [{ refId: params.refId.toUpperCase() }, resourceScope(ws)] },
     include: {
       control: true,
       resource: { include: { cloudAccount: true, project: true } },
@@ -30,6 +32,7 @@ export default async function IssueDetailPage({
 
   // Neighbours in triage order (status → severity → ref), for prev/next navigation
   const all = await db.issue.findMany({
+    where: resourceScope(ws),
     select: { refId: true, status: true, severity: true },
   });
   const statusRank: Record<string, number> = { OPEN: 0, IN_PROGRESS: 1, RESOLVED: 2, REJECTED: 3 };

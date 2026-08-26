@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { guardMutation } from "@/lib/guard";
+import { apiWorkspace, resourceScope } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -14,6 +15,9 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   const denied = guardMutation(req);
   if (denied) return denied;
+
+  const { ctx, denied: unauth } = await apiWorkspace();
+  if (unauth) return unauth;
 
   const apiKey = process.env.OPENAI_API_KEY ?? "";
   if (apiKey === "") {
@@ -34,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
   const issue = await db.issue.findFirst({
-    where: { refId: refId.toUpperCase() },
+    where: { AND: [{ refId: refId.toUpperCase() }, resourceScope(ctx)] },
     include: {
       control: true,
       resource: { include: { cloudAccount: true, project: true, _count: { select: { vulnerabilities: true } } } },

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireWorkspace, resourceScope } from "@/lib/rbac";
 import { IssuesClient } from "./issues-client";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +11,9 @@ export default async function IssuesPage({
 }: {
   searchParams?: { ref?: string; status?: string; severity?: string };
 }) {
+  const ws = await requireWorkspace();
   const issues = await db.issue.findMany({
+    where: resourceScope(ws),
     include: {
       control: true,
       resource: { include: { project: true, cloudAccount: true } },

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireWorkspace, resourceScope } from "@/lib/rbac";
 import { severityStyle } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +11,9 @@ export default async function VulnerabilitiesPage({
 }: {
   searchParams?: { page?: string };
 }) {
+  const ws = await requireWorkspace();
   const vulns = await db.vulnerability.findMany({
+    where: resourceScope(ws),
     include: { resource: true },
     orderBy: [{ cvss: "desc" }],
   });

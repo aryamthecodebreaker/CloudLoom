@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireWorkspace, accountScope, edgeScope } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Identities" };
@@ -7,11 +8,13 @@ export const metadata = { title: "Identities" };
 const TRAVERSE_KINDS = new Set(["ACCESSES", "ASSUMES", "EXPOSES", "DECRYPTS_WITH"]);
 
 export default async function IdentitiesPage() {
+  const ws = await requireWorkspace();
   const [resources, edges] = await Promise.all([
     db.resource.findMany({
+      where: accountScope(ws),
       include: { cloudAccount: true, project: true, _count: { select: { issues: true } } },
     }),
-    db.graphEdge.findMany(),
+    db.graphEdge.findMany({ where: edgeScope(ws) }),
   ]);
 
   const byId = new Map(resources.map((r) => [r.id, r]));

@@ -27,11 +27,26 @@ export async function POST(req: NextRequest) {
   const denied = guardMutation(req);
   if (denied) return denied;
 
-  const token = process.env.INGEST_TOKEN ?? "";
-  const provided = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
-  if (token === "" || provided === "" || provided !== token) {
+  const provided = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim() ?? "";
+  if (provided === "") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Token → workspace. Per-workspace tokens (Workspace.ingestToken) are
+  // canonical; the env INGEST_TOKEN maps to the single "Default" workspace
+  // for env-only setups.
+  let workspace = await db.workspace.findUnique({ where: { ingestToken: provided } });
+  if (!workspace && provided === (process.env.INGEST_TOKEN ?? "")) {
+    workspace = await db.workspace.upsert({
+      where: { name: "Default" },
+      update: { ingestToken: provided },
+      create: { name: "Default", ingestToken: provided },
+    });
+  }
+  if (!workspace) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const workspaceId = workspace.id;
 
   const body = (await req.json().catch(() => null)) as IngestBody | null;
   const prov = typeof body?.provider === "string" ? body.provider : "";
@@ -47,11 +62,11 @@ export async function POST(req: NextRequest) {
     typeof body!.account === "string" && body!.account !== "" ? body!.account : accountId;
 
   let account = await db.cloudAccount.findFirst({
-    where: { provider: prov, externalId: accountId },
+    where: { provider: prov, externalId: accountId, workspaceId },
   });
   if (!account) {
     account = await db.cloudAccount.create({
-      data: { provider: prov, externalId: accountId, name: accountName, status: "CONNECTED", lastScanAt: new Date() },
+      data: { provider: prov, externalId: accountId, name: accountName, status: "CONNECTED", lastScanAt: new Date(), workspaceId },
     });
   } else {
     account = await db.cloudAccount.update({
@@ -109,7 +124,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (driftEvents.length > 0) {
-    await db.cloudEvent.createMany({ data: driftEvents });
+    await db.cloudEvent.createMany({ data: driftEvents.map((d) => ({ ...d, workspaceId })) });
     for (const d of driftEvents) {
       if (d.result === "SUSPICIOUS") {
         await notify(`:rotating_light: CloudLoom — ${d.action} (${d.actor})`);
@@ -125,6 +140,7 @@ export async function POST(req: NextRequest) {
       target: account.name,
       result: "SUCCESS",
       source: "CloudLoom Agent",
+      workspaceId,
     },
   });
 

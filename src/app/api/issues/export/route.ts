@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { csvCell } from "@/lib/csv";
+import { apiWorkspace, resourceScope } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
 
 export async function GET() {
+  const { ctx, denied } = await apiWorkspace();
+  if (denied) return denied;
+
   const issues = await db.issue.findMany({
+    where: resourceScope(ctx),
     include: {
       control: true,
       resource: { include: { cloudAccount: true, project: true } },

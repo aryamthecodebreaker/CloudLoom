@@ -1,12 +1,18 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireWorkspace } from "@/lib/rbac";
 import { eventStyle, relTime } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Activity" };
 
 export default async function EventsPage() {
-  const events = await db.cloudEvent.findMany({ orderBy: { ts: "desc" }, take: 100 });
+  const ws = await requireWorkspace();
+  const events = await db.cloudEvent.findMany({
+    where: { workspaceId: ws.workspaceId },
+    orderBy: { ts: "desc" },
+    take: 100,
+  });
 
   return (
     <div className="mx-auto max-w-5xl p-8">

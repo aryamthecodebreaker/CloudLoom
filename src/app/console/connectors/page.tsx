@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { requireWorkspace } from "@/lib/rbac";
 import { formatDate } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +12,11 @@ const STEPS = [
 ] as const;
 
 export default async function ConnectorsPage() {
+  const ws = await requireWorkspace();
+  const canSeeToken = ws.role === "OWNER" || ws.role === "ADMIN";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://trycloudloom.vercel.app";
   const accounts = await db.cloudAccount.findMany({
+    where: { workspaceId: ws.workspaceId },
     orderBy: [{ status: "asc" }, { name: "asc" }],
     include: { _count: { select: { resources: true } } },
   });
@@ -65,10 +70,13 @@ export default async function ConnectorsPage() {
             <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-ink font-mono text-[11px] font-bold text-paper">3</span>
             <div>
               <p className="text-sm font-semibold text-coal">Push into this graph</p>
-              <pre className="mt-1 overflow-x-auto rounded-md bg-coal p-3 font-mono text-xs text-paper/85"><code>{`export CLOUDLOOM_PUSH_URL=https://trycloudloom.vercel.app
-export CLOUDLOOM_PUSH_TOKEN=<INGEST_TOKEN>
+              <pre className="mt-1 overflow-x-auto rounded-md bg-coal p-3 font-mono text-xs text-paper/85"><code>{`export CLOUDLOOM_PUSH_URL=${appUrl}
+export CLOUDLOOM_PUSH_TOKEN=${canSeeToken ? ws.ingestToken : "<ask an admin for the workspace token>"}
 ./cloudloom-agent -provider aws -account 123456789012 -push`}</code></pre>
               <p className="mt-1.5 text-xs text-slate-400">
+                {canSeeToken
+                  ? `This token is scoped to "${ws.workspaceName}" — snapshots pushed with it land in this console only. Treat it as a secret.`
+                  : "Ingestion tokens are shown to admins and owners only."}{" "}
                 Built-in controls then evaluate your real resources into open issues automatically.
               </p>
             </div>

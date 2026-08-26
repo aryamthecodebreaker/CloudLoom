@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { requireWorkspace, resourceScope } from "@/lib/rbac";
 import { FAMILY_COLORS } from "../colors";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +11,7 @@ export default async function FrameworkDetailPage({
 }: {
   params: { id: string };
 }) {
+  const ws = await requireWorkspace();
   const framework = await db.complianceFramework.findUnique({ where: { id: params.id } });
   if (!framework) notFound();
 
@@ -17,7 +19,7 @@ export default async function FrameworkDetailPage({
     where: { framework: framework.name },
     include: {
       issues: {
-        where: { status: { in: ["OPEN", "IN_PROGRESS"] } },
+        where: { AND: [{ status: { in: ["OPEN", "IN_PROGRESS"] } }, resourceScope(ws)] },
         include: { resource: { select: { id: true, name: true } } },
       },
     },

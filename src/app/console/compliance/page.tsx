@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireWorkspace, resourceScope } from "@/lib/rbac";
 import { ensureFrameworks } from "@/lib/catalog";
 import { FAMILY_COLORS } from "./colors";
 
@@ -7,13 +8,17 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Compliance" };
 
 export default async function CompliancePage() {
+  const ws = await requireWorkspace();
   await ensureFrameworks();
 
   const [frameworks, controls] = await Promise.all([
     db.complianceFramework.findMany({ orderBy: { name: "asc" } }),
     db.control.findMany({
       include: {
-        issues: { where: { status: { in: ["OPEN", "IN_PROGRESS"] } }, include: { resource: { select: { name: true } } } },
+        issues: {
+          where: { AND: [{ status: { in: ["OPEN", "IN_PROGRESS"] } }, resourceScope(ws)] },
+          include: { resource: { select: { name: true } } },
+        },
       },
     }),
   ]);

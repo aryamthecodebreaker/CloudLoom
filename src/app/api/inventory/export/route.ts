@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { csvCell } from "@/lib/csv";
+import { apiWorkspace, accountScope } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
 /** Full inventory export (SBOM-style): every discovered resource. */
 export async function GET() {
+  const { ctx, denied } = await apiWorkspace();
+  if (denied) return denied;
+
   const resources = await db.resource.findMany({
+    where: accountScope(ctx),
     include: { cloudAccount: true, project: true, _count: { select: { issues: true, vulnerabilities: true } } },
     orderBy: [{ provider: "asc" }, { name: "asc" }],
   });

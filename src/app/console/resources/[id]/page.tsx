@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { requireWorkspace, accountScope, edgeScope, resourceScope } from "@/lib/rbac";
 import { EDGE_LEGEND, edgeColor, formatDate, relTime, severityStyle, SEVERITY_STYLES, statusStyle } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
@@ -10,8 +11,9 @@ export default async function ResourceDetailPage({
 }: {
   params: { id: string };
 }) {
-  const resource = await db.resource.findUnique({
-    where: { id: params.id },
+  const ws = await requireWorkspace();
+  const resource = await db.resource.findFirst({
+    where: { AND: [{ id: params.id }, accountScope(ws)] },
     include: {
       cloudAccount: true,
       project: true,
@@ -22,7 +24,9 @@ export default async function ResourceDetailPage({
   if (!resource) notFound();
 
   const edges = await db.graphEdge.findMany({
-    where: { OR: [{ fromId: resource.id }, { toId: resource.id }] },
+    where: {
+      AND: [{ OR: [{ fromId: resource.id }, { toId: resource.id }] }, edgeScope(ws)],
+    },
     include: { from: { select: { id: true, name: true } }, to: { select: { id: true, name: true } } },
   });
   const outgoing = edges.filter((e) => e.fromId === resource.id);
@@ -30,7 +34,7 @@ export default async function ResourceDetailPage({
 
   // Attack paths whose hops mention this resource
   const pathsThrough = await db.issue.findMany({
-    where: { attackPathJson: { contains: resource.name } },
+    where: { AND: [{ attackPathJson: { contains: resource.name } }, resourceScope(ws)] },
     select: { refId: true, title: true, severity: true },
     take: 5,
   });

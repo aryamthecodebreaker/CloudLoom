@@ -37,8 +37,49 @@ model CloudAccount {
   lastScanAt  DateTime?
   resources   Resource[]
   createdAt   DateTime   @default(now())
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, externalId])
+  @@unique([provider, externalId, workspaceId])
+  @@index([workspaceId])
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime @default(now())
+  memberships  AccountMember[]
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  ingestToken String   @unique
+  createdAt   DateTime @default(now())
+  members     AccountMember[]
+  cloudAccounts CloudAccount[]
+  events        CloudEvent[]
+}
+
+model AccountMember {
+  id          String     @id @default(cuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  role        MemberRole @default(MEMBER)
+  createdAt   DateTime   @default(now())
+
+  @@unique([userId, workspaceId])
 }
 
 model Project {
@@ -150,6 +191,9 @@ model CloudEvent {
   target String
   result      EventResult
   source String
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([ts])
+  @@index([workspaceId])
 }

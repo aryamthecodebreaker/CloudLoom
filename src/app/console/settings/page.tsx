@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireWorkspace } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Settings" };
@@ -12,14 +13,15 @@ function Status({ configured }: { configured: boolean }) {
 }
 
 export default async function SettingsPage() {
+  const ws = await requireWorkspace();
   // Presence only — values are never rendered.
   const integrations = [
     {
       name: "Agent ingestion token",
-      env: "INGEST_TOKEN",
-      configured: !!process.env.INGEST_TOKEN,
-      note: "The Go agent authenticates with this token to push real discoveries.",
-      doc: "Set in your hosting provider's environment variables.",
+      env: `workspace: ${ws.workspaceName}`,
+      configured: true,
+      note: "Each workspace has its own token — the Go agent authenticates with it to push real discoveries into this console. Find it on the Connectors page.",
+      doc: "The deployment-wide INGEST_TOKEN env var still maps to the Default workspace for env-only self-hosts.",
     },
     {
       name: "Alert webhook",

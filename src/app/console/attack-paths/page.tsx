@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireWorkspace, resourceScope } from "@/lib/rbac";
 import { parseAttackPath, severityStyle, statusStyle, type AttackHop } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
@@ -25,8 +26,9 @@ export default async function AttackPathsPage({
 }: {
   searchParams?: { severity?: string; status?: string };
 }) {
+  const ws = await requireWorkspace();
   const paths = await db.issue.findMany({
-    where: { attackPathJson: { not: null } },
+    where: { AND: [{ attackPathJson: { not: null } }, resourceScope(ws)] },
     include: { resource: { include: { cloudAccount: true, project: true } }, control: true },
     orderBy: { refId: "desc" },
   });

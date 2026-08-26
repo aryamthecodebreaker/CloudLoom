@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "./logo";
+import { SignOutButton } from "./sign-out-button";
 import { useToast } from "./toast";
 
 const nav = [
@@ -37,7 +38,7 @@ function NavIcon({ href }: { href: string }) {
     default: return null;
   }
 }
-export function ConsoleSidebar({ connected = 0 }: { connected?: number }) {
+export function ConsoleSidebar({ connected = 0, workspaceName, role = "MEMBER" }: { connected?: number; workspaceName?: string; role?: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
@@ -61,7 +62,9 @@ export function ConsoleSidebar({ connected = 0 }: { connected?: number }) {
     <aside className="flex h-screen w-16 shrink-0 flex-col border-r border-white/10 bg-coal text-slate-300 lg:w-60">
       <div className="border-b border-white/10 px-5 py-5">
         <Link href="/" aria-label="CloudLoom home"><Logo dark /></Link>
-        <p className="mt-1 hidden pl-8 text-[10px] uppercase tracking-[0.2em] text-slate-500 lg:block">
+        <p className="mt-1 truncate text-[11px] font-semibold text-slate-300">{workspaceName ?? "Workspace"}</p>
+        <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-slate-500">{role}</p>
+<p className="mt-1 hidden pl-8 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 lg:block">
           {connected === 0
             ? "No account connected"
             : `${connected} account${connected === 1 ? "" : "s"} connected`}

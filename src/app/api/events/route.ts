@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { guardMutation } from "@/lib/guard";
+import { apiWorkspace, denyBelowRole } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,11 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   const denied = guardMutation(req);
   if (denied) return denied;
+
+  const { ctx, denied: unauth } = await apiWorkspace();
+  if (unauth) return unauth;
+  const forbidden = denyBelowRole(ctx, "MEMBER");
+  if (forbidden) return forbidden;
 
   const body = await req.json().catch(() => null);
   const refId = typeof body?.refId === "string" ? body.refId : null;
@@ -25,6 +31,7 @@ export async function POST(req: NextRequest) {
       target: refId,
       result: "SUCCESS",
       source: "CloudLoom Agent",
+      workspaceId: ctx.workspaceId,
     },
   });
   return NextResponse.json(event);

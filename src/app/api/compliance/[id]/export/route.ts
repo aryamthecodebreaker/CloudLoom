@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { csvCell } from "@/lib/csv";
+import { apiWorkspace, resourceScope } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,9 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { ctx, denied } = await apiWorkspace();
+  if (denied) return denied;
+
   const framework = await db.complianceFramework.findUnique({ where: { id: params.id } });
   if (!framework) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -16,7 +20,7 @@ export async function GET(
     where: { framework: framework.name },
     include: {
       issues: {
-        where: { status: { in: ["OPEN", "IN_PROGRESS"] } },
+        where: { AND: [{ status: { in: ["OPEN", "IN_PROGRESS"] } }, resourceScope(ctx)] },
         include: { resource: { select: { name: true } } },
       },
     },

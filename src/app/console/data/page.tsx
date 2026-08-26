@@ -1,18 +1,21 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireWorkspace, accountScope, edgeScope } from "@/lib/rbac";
 import { PROVIDER_LABELS, severityStyle } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Data" };
 
 export default async function DataPage() {
+  const ws = await requireWorkspace();
   const [stores, edges] = await Promise.all([
     db.resource.findMany({
-      where: { hasSensitiveData: true },
+      where: { AND: [{ hasSensitiveData: true }, accountScope(ws)] },
       include: { cloudAccount: true, project: true, _count: { select: { issues: true } } },
       orderBy: [{ isPublic: "desc" }, { name: "asc" }],
     }),
     db.graphEdge.findMany({
+      where: edgeScope(ws),
       include: { from: { select: { id: true, name: true, type: true } } },
     }),
   ]);
