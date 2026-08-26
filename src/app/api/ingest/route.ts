@@ -5,11 +5,6 @@ import { guardMutation } from "@/lib/guard";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-type RouteResource = {
-  name?: unknown; type?: unknown; region?: unknown;
-  externalId?: unknown; isPublic?: unknown; hasSensitiveData?: unknown;
-};
 
 type IngestBody = {
   provider?: unknown; accountId?: unknown; account?: unknown;
