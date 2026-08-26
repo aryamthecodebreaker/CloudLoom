@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, EventResult, IssueStatus, Severity } from "@prisma/client";
 
 export type SeedCounts = { accounts: number; resources: number; issues: number; edges: number; events: number };
 
@@ -104,7 +104,7 @@ export async function runSeed(): Promise<SeedCounts> {
       { controlId: "C-1008", name: "Database backup unencrypted in staging", category: "Posture", severity: "MEDIUM", description: "Snapshot or export written without envelope encryption.", queryHint: 'database.backup.encrypted = false' },
       { controlId: "C-1009", name: "Security group allows 0.0.0.0/0 on admin port", category: "Network", severity: "HIGH", description: "Firewall rule admits all sources on SSH/RDP or other administrative ports.", queryHint: 'network.rule.port IN [22,3389] AND source = "0.0.0.0/0"' },
       { controlId: "C-1010", name: "Service account token automounted in pod spec", category: "Identity & Entitlements", severity: "LOW", description: "Pod mounts cloud credentials it never uses at runtime.", queryHint: 'pod.serviceAccountToken.autoMount = true AND usage = none' },
-    ].map((c) => db.control.create({ data: c }))
+    ].map((c) => db.control.create({ data: { ...c, severity: c.severity as Severity } }))
   );
   const ctl = Object.fromEntries(controls.map((c) => [c.controlId, c]));
 
@@ -144,7 +144,7 @@ export async function runSeed(): Promise<SeedCounts> {
     await db.issue.create({
       data: {
         refId: i.refId, title: i.title, description: i.description,
-        status: i.status, severity: i.severity, attackPathJson: i.attackPathJson ?? null,
+        status: i.status as IssueStatus, severity: i.severity as Severity, attackPathJson: i.attackPathJson ?? null,
         controlId: control.id, resourceId: i.resource.id,
       },
     });
@@ -182,7 +182,9 @@ export async function runSeed(): Promise<SeedCounts> {
 
   // ---- Simulated cloud activity feed ----
   const h = (n: number) => new Date(Date.now() - n * 60 * 60 * 1000);
-  const eventRows = [
+  const eventRows: Array<{
+    ts: Date; actor: string; action: string; target: string; result: EventResult; source: string;
+  }> = [
     { ts: h(0.4), actor: "deploy-bot@cloudloom", action: "Pushed image sha256:9f2c… to staging-web-ecs", target: "staging-web-ecs", result: "SUCCESS", source: "AWS CloudTrail" },
       { ts: h(1.1), actor: "iam/user=ops-maria", action: "PutBucketAcl → public-read on prod-pii-bucket", target: "prod-pii-bucket", result: "SUSPICIOUS", source: "AWS CloudTrail" },
       { ts: h(2.3), actor: "system/aws-config", action: "Recorded drift on sg-0af31c (22 added ingress)", target: "prod-sgx-worker", result: "SUCCESS", source: "AWS Config" },
@@ -233,7 +235,7 @@ export async function runSeed(): Promise<SeedCounts> {
   for (const [cve, cvss, severity, pkg, inst, fixed, exploited, desc] of vulnSeed) {
     for (const target of vulnTargets[cve] ?? []) {
       await db.vulnerability.create({
-        data: { cveId: cve, cvss, severity, packageName: pkg, installedVersion: inst, fixedVersion: fixed, exploitedInWild: exploited, description: desc, resourceId: byName[target].id },
+        data: { cveId: cve, cvss, severity: severity as Severity, packageName: pkg, installedVersion: inst, fixedVersion: fixed, exploitedInWild: exploited, description: desc, resourceId: byName[target].id },
       });
     }
   }

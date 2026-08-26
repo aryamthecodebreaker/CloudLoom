@@ -25,10 +25,12 @@ export default async function SecurityDashboard() {
     SEVERITIES.map((s) => [s, severityGroups.find((g) => g.severity === s)?._count._all ?? 0])
   );
   const maxSev = Math.max(1, ...Object.values(bySeverity));
-  const lastSync = accounts.reduce<Date | null>(
-    (latest, a) => (a.lastScanAt && (!latest || a.lastScanAt > latest) ? a.lastScanAt : latest),
-    null
-  );
+  const healthyScans = accounts
+    .filter((a) => a.status === "CONNECTED" && a.lastScanAt)
+    .map((a) => a.lastScanAt as Date);
+  const lastSync = healthyScans.length
+    ? new Date(Math.min(...healthyScans.map((d) => d.getTime())))
+    : null;
 
   return (
     <div className="mx-auto max-w-6xl p-8">
@@ -47,10 +49,10 @@ export default async function SecurityDashboard() {
 
       {/* KPI cards — hierarchy by order and weight, not rainbow strips */}
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi label="Open issues" value={openCount} sub={`${closedCount} closed`} alarm={false} />
-        <Kpi label="Critical attack paths" value={criticalPaths.length} sub="entry → sensitive data" alarm={criticalPaths.length > 0} />
-        <Kpi label="Monitored resources" value={resources} sub={`${accounts.filter(a => a.status === "CONNECTED").length}/${accounts.length} connectors healthy`} alarm={false} />
-        <Kpi label="Exploited-in-the-wild CVEs" value={kevCount} sub="across your workloads" alarm={false} />
+        <Kpi href="/console/issues?status=OPEN" label="Open issues" value={openCount} sub={`${closedCount} closed`} alarm={false} />
+        <Kpi href="/console/attack-paths" label="Critical attack paths" value={criticalPaths.length} sub="entry → sensitive data" alarm={criticalPaths.length > 0} />
+        <Kpi href="/console/inventory" label="Monitored resources" value={resources} sub={`${accounts.filter(a => a.status === "CONNECTED").length}/${accounts.length} connectors healthy`} alarm={false} />
+        <Kpi href="/console/vulnerabilities" label="Exploited-in-the-wild CVEs" value={kevCount} sub="across your workloads" alarm={false} />
       </section>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
@@ -162,15 +164,15 @@ export default async function SecurityDashboard() {
   );
 }
 
-function Kpi({ label, value, sub, alarm }: { label: string; value: number; sub: string; alarm: boolean }) {
+function Kpi({ label, value, sub, alarm, href }: { label: string; value: number; sub: string; alarm: boolean; href: string }) {
   return (
-    <article className="rounded-md border border-line bg-white p-5">
+    <Link href={href} className="block rounded-md border border-line bg-white p-5 transition-colors hover:border-ink/40">
       <p className="font-mono text-[11px] uppercase tracking-wider text-ink-faint">{label}</p>
       <p className={`mt-2 text-3xl font-semibold tracking-tight ${alarm ? "text-red-600" : "text-ink"}`}>
         {value}
-        {alarm && <span className="ml-2 inline-block h-2 w-2 rounded-full bg-red-600 align-middle" aria-label="needs attention" />}
+        {alarm && <span className="ml-2 inline-block h-2 w-2 rounded-full bg-red-600 align-middle" aria-hidden />}
       </p>
       <p className="mt-1 text-xs text-ink-faint">{sub}</p>
-    </article>
+    </Link>
   );
 }

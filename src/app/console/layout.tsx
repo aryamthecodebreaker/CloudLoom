@@ -8,7 +8,7 @@ export default function ConsoleLayout({
   return (
     <div className="flex min-h-screen bg-cream">
       <ConsoleSidebar />
-      <main className="h-screen flex-1 overflow-y-auto">{children}</main>
+      <main id="main" className="h-screen flex-1 overflow-y-auto">{children}</main>
     </div>
   );
 }

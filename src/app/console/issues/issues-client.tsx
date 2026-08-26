@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { severityStyle, statusStyle } from "@/lib/ui";
+import { STATUSES, severityStyle, statusStyle } from "@/lib/ui";
 
 type Row = {
   id: string; refId: string; title: string; description: string;
@@ -13,7 +13,7 @@ type Row = {
 };
 
 const SEV_ORDER = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"];
-const STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "REJECTED"];
+
 
 export function IssuesClient({
   initial,
@@ -98,11 +98,11 @@ export function IssuesClient({
           />
           <kbd className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-line bg-cream px-1.5 text-[10px] font-semibold text-slate-400">/</kbd>
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-accent">
+        <select aria-label="Filter by status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-accent">
           <option value="ALL">All statuses</option>
           {STATUSES.map((s) => <option key={s} value={s}>{s.replace("_", " ")}</option>)}
         </select>
-        <select value={sevFilter} onChange={(e) => setSevFilter(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-accent">
+        <select aria-label="Filter by severity" value={sevFilter} onChange={(e) => setSevFilter(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-accent">
           <option value="ALL">All severities</option>
           {SEV_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -115,7 +115,7 @@ export function IssuesClient({
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-white shadow-card">
         <table className="w-full text-left text-sm">
-          <thead className="bg-cream text-xs uppercase tracking-wide text-slate-500">
+          <thead className="sticky top-0 z-10 bg-cream text-xs uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-5 py-3.5">Issue</th>
               <th className="px-4 py-3.5">Severity</th>

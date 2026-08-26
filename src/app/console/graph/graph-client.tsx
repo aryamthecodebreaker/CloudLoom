@@ -251,9 +251,10 @@ export function GraphClient({ nodes, edges }: { nodes: GraphNode[]; edges: Graph
         {/* Filters */}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {providers.map((p) => (
-            <button
-              key={p}
-              onClick={() => toggleProvider(p)}
+              <button
+                key={p}
+                aria-pressed={activeProviders.has(p)}
+                onClick={() => toggleProvider(p)}
               className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
                 activeProviders.has(p)
                   ? "bg-accent text-white shadow-sm"

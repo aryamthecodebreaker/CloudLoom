@@ -25,6 +25,8 @@ import (
 	"time"
 
 	"github.com/aryamthecodebreaker/CloudLoom/agent/internal/aws"
+"github.com/aryamthecodebreaker/CloudLoom/agent/internal/azure"
+"github.com/aryamthecodebreaker/CloudLoom/agent/internal/kubernetes"
 	"github.com/aryamthecodebreaker/CloudLoom/agent/internal/provider"
 )
 
@@ -33,6 +35,8 @@ func main() {
 		provName   = flag.String("provider", envOr("CLOUDLOOM_PROVIDER", "aws"), "cloud provider: aws | azure | kubernetes")
 		account    = flag.String("account", os.Getenv("CLOUDLOOM_AWS_ACCOUNT"), "AWS 12-digit account ID")
 		region     = flag.String("region", os.Getenv("CLOUDLOOM_AWS_REGION"), "AWS region to discover first")
+		sub        = flag.String("subscription", os.Getenv("CLOUDLOOM_AZURE_SUBSCRIPTION"), "Azure subscription UUID")
+		kubeCtx    = flag.String("kube-context", os.Getenv("CLOUDLOOM_KUBE_CONTEXT"), "kubeconfig context (empty = current)")
 		push       = flag.Bool("push", false, "push the snapshot to CLOUDLOOM_PUSH_URL instead of printing")
 		timeoutSec = flag.Int("timeout", 120, "discovery timeout in seconds")
 	)
@@ -49,8 +53,20 @@ func main() {
 			exit(2, err)
 		}
 		prov = conn
+	case "azure":
+		conn, err := azure.New(*sub)
+		if err != nil {
+			exit(2, err)
+		}
+		prov = conn
+	case "kubernetes", "k8s":
+		conn, err := kubernetes.New(*kubeCtx)
+		if err != nil {
+			exit(2, err)
+		}
+		prov = conn
 	default:
-		exit(2, fmt.Errorf("unsupported provider %q — supported today: aws (azure, kubernetes landing next)", *provName))
+		exit(2, fmt.Errorf("unsupported provider %q — supported: aws, azure, kubernetes", *provName))
 	}
 	defer prov.Close()
 
