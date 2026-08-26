@@ -79,7 +79,10 @@ model Control {
   category    String
   severity    Severity
   queryHint   String
+  framework   String?
   issues      Issue[]
+
+  @@index([framework])
 }
 
 model Issue {

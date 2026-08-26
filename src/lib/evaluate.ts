@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { ensureFrameworks } from "@/lib/catalog";
 
 // Wire shape mirrors agent/internal/provider.Resource (Go) — camelCase JSON.
 export type IngestResource = {
@@ -20,6 +21,7 @@ const REAL_CONTROLS: Array<{
   description: string;
   severity: "CRITICAL" | "HIGH" | "MEDIUM";
   category: string;
+  framework: string;
   queryHint: string;
   match: (r: IngestResource) => boolean;
   issueTitle: (r: IngestResource) => string;
@@ -31,6 +33,7 @@ const REAL_CONTROLS: Array<{
     description: "Storage reachable by anonymous principals. Public buckets are the most common cause of real cloud data breaches.",
     severity: "CRITICAL",
     category: "Data Security",
+    framework: "PCI DSS v4.0",
     queryHint: "resource.type = storage AND resource.isPublic",
     match: (r) => r.isPublic === true && /storage|bucket/i.test(r.type),
     issueTitle: (r) => `Object storage "${r.name}" is publicly accessible`,
@@ -42,6 +45,7 @@ const REAL_CONTROLS: Array<{
     description: "Virtual machines with public IPs are the entry point of most cloud intrusions. Pair exposure with patch status before judging severity.",
     severity: "HIGH",
     category: "Network",
+    framework: "CIS AWS Foundations v3.0",
     queryHint: "resource.type = vm AND resource.isPublic",
     match: (r) => r.isPublic === true && /virtual machine|instance/i.test(r.type),
     issueTitle: (r) => `Compute "${r.name}" is reachable from the internet`,
@@ -53,6 +57,7 @@ const REAL_CONTROLS: Array<{
     description: "Roles whose trust policy accepts external accounts or anonymous principals can be hijacked by parties outside your organization.",
     severity: "HIGH",
     category: "Identity & Entitlements",
+    framework: "SOC 2 Type II",
     queryHint: "resource.type = identity AND resource.isPublic",
     match: (r) => r.isPublic === true && /identity|role/i.test(r.type),
     issueTitle: (r) => `Identity "${r.name}" trusts principals outside the account`,
@@ -62,6 +67,7 @@ const REAL_CONTROLS: Array<{
 
 /** Ensure the built-in real-ingestion controls exist (idempotent). */
 export async function ensureRealControls() {
+  await ensureFrameworks();
   for (const c of REAL_CONTROLS) {
     await db.control.upsert({
       where: { controlId: c.controlId },
@@ -71,6 +77,7 @@ export async function ensureRealControls() {
         name: c.name,
         description: c.description,
         severity: c.severity,
+        framework: c.framework,
         category: c.category,
         queryHint: c.queryHint,
       },

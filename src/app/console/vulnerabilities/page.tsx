@@ -1,22 +1,33 @@
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { severityStyle } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Vulnerabilities" };
 
-export default async function VulnerabilitiesPage() {
+export default async function VulnerabilitiesPage({
+  searchParams,
+}: {
+  searchParams?: { page?: string };
+}) {
   const vulns = await db.vulnerability.findMany({
     include: { resource: true },
     orderBy: [{ cvss: "desc" }],
   });
 
   const kev = vulns.filter((v) => v.exploitedInWild);
+  const PAGE_SIZE = 8;
   const byCve = new Map<string, typeof vulns>();
   for (const v of vulns) {
     const list = byCve.get(v.cveId) ?? [];
     list.push(v);
     byCve.set(v.cveId, list);
   }
+
+  const groups = [...byCve.entries()];
+  const totalPages = Math.max(1, Math.ceil(groups.length / PAGE_SIZE));
+  const page = Math.min(Math.max(1, parseInt(searchParams?.page ?? "1", 10) || 1), totalPages);
+  const pageGroups = groups.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className="mx-auto max-w-6xl p-8">
@@ -33,7 +44,7 @@ export default async function VulnerabilitiesPage() {
       </header>
 
       <div className="mt-6 space-y-4">
-        {[...byCve.entries()].map(([cve, hits]) => {
+        {pageGroups.map(([cve, hits]) => {
           const v = hits[0];
           const maxSevOnTargets = Math.max(...hits.map((h) => h.cvss));
           return (
@@ -86,6 +97,15 @@ export default async function VulnerabilitiesPage() {
             </article>
           );
         })}
+      <nav className="mt-8 flex items-center justify-between text-sm">
+        {page > 1 ? (
+          <Link href={`/console/vulnerabilities?page=${page - 1}`} className="btn-secondary">← Previous</Link>
+        ) : <span />}
+        <span className="font-mono text-xs text-slate-400">page {page} of {totalPages} · {byCve.size} CVEs</span>
+        {page < totalPages ? (
+          <Link href={`/console/vulnerabilities?page=${page + 1}`} className="btn-secondary">Next →</Link>
+        ) : <span />}
+      </nav>
       </div>
     </div>
   );
