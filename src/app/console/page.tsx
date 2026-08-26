@@ -41,9 +41,6 @@ export default async function SecurityDashboard() {
             Environment-wide risk at a glance · Last sync {formatDate(lastSync)}
           </p>
         </div>
-        <span className="badge bg-amber-100 px-3 py-1.5 text-amber-700" title="No live cloud connections — seeded simulation">
-          Simulated data
-        </span>
         <Link href="/console/issues" className="btn-secondary">View all issues →</Link>
       </header>
 
@@ -59,6 +56,11 @@ export default async function SecurityDashboard() {
         {/* Open issues by severity */}
         <section className="rounded-2xl border border-line bg-white p-6 shadow-card lg:col-span-3">
           <h2 className="font-bold text-coal">Open issues by severity</h2>
+          {openCount === 0 ? (
+            <p className="py-6 text-sm text-slate-500">
+              No open issues. Connect a cloud account and findings will appear here as the agent discovers them.
+            </p>
+          ) : (
           <div className="mt-5 space-y-4">
             {SEVERITIES.map((s) => (
               <div key={s} className="flex items-center gap-4">
@@ -76,6 +78,7 @@ export default async function SecurityDashboard() {
               </div>
             ))}
           </div>
+          )}
           <Link href="/console/issues?status=OPEN" className="mt-6 inline-block text-sm font-semibold text-accent hover:underline">
             Triage open issues →
           </Link>

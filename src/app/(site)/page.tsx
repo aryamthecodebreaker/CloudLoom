@@ -104,10 +104,9 @@ export default function LandingPage() {
 $ cd CloudLoom && cp .env.example .env
 $ npm install
 
-$ npm run db:push && npm run db:seed   # schema + demo estate
 $ npm run dev
 
-`}<span className="text-emerald-400">✓ ready in under two minutes</span>{"\n"}<span className="text-white/45">→ http://localhost:3000/console</span></code></pre>
+`}<span className="text-emerald-400">✓ console ready — connect a cloud via the agent</span>{"\n"}<span className="text-white/45">→ http://localhost:3000/console</span></code></pre>
           </div>
           <p className="mt-3 font-mono text-xs text-ink-faint">No signup. No cloud credentials. Seeded data only.</p>
         </Reveal>

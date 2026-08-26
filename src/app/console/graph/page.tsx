@@ -48,13 +48,10 @@ export default async function GraphExplorerPage() {
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-coal">Graph Explorer</h1>
           <p className="mt-1 text-sm text-slate-500">
-            The seeded security graph, drawn. Columns are cloud accounts; edges show how risk
+            Your security graph, drawn. Columns are cloud accounts; edges show how risk
             travels. Click any node to inspect it.
           </p>
         </div>
-        <span className="badge bg-amber-100 px-3 py-1.5 text-amber-700" title="No live cloud connections — seeded simulation">
-          Simulated data
-        </span>
       </header>
       <GraphClient nodes={nodes} edges={edges.map((e) => ({ fromId: e.fromId, kind: e.kind, toId: e.toId }))} />
     </div>

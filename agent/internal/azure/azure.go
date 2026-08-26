@@ -52,7 +52,7 @@ func (c *Connector) Discover(ctx context.Context) (provider.Snapshot, error) {
 	if err != nil {
 		return snap, fmt.Errorf("azure: compute client: %v", err)
 	}
-	pager := vmClient.NewListPager(nil)
+	pager := vmClient.NewListPager(&armcompute.VirtualMachinesClientListOptions{})
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
@@ -73,7 +73,7 @@ func (c *Connector) Discover(ctx context.Context) (provider.Snapshot, error) {
 	if err != nil {
 		return snap, fmt.Errorf("azure: storage client: %v", err)
 	}
-	stPager := stClient.NewListPager(nil)
+	stPager := stClient.NewListPager(&armstorage.AccountsClientListOptions{})
 	for stPager.More() {
 		page, err := stPager.NextPage(ctx)
 		if err != nil {

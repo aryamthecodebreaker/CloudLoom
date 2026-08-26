@@ -103,9 +103,7 @@ npm install
 # 2. Configure env — point DATABASE_URL at any Postgres instance
 cp .env.example .env          # Windows: copy .env.example .env
 
-# 3. Create the schema & seed realistic demo data
 npm run db:push
-npm run db:seed
 
 # 4. Launch
 npm run dev                   # marketing site at http://localhost:3000

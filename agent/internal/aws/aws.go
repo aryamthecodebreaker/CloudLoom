@@ -16,10 +16,9 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/aws/aws-sdk-go-v2/service/iam"
+		"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
+	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
 	"github.com/aryamthecodebreaker/CloudLoom/agent/internal/provider"
@@ -200,7 +199,7 @@ func (c *Connector) discoverIAM(ctx context.Context) ([]provider.Resource, error
 	return out, nil
 }
 
-func hasExternalPrincipal(r s3types.Role) bool {
+func hasExternalPrincipal(r iamtypes.Role) bool {
 	if r.AssumeRolePolicyDocument == nil {
 		return false
 	}

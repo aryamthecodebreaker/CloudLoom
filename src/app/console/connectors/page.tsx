@@ -72,6 +72,11 @@ export CLOUDLOOM_PUSH_TOKEN=<INGEST_TOKEN>
           </li>
         </ol>
       </section>
+      {accounts.length === 0 && (
+        <p className="mt-8 rounded-md border border-dashed border-line bg-white py-14 text-center text-sm text-slate-500">
+          No cloud accounts connected yet. Run the agent below to discover your first one.
+        </p>
+      )}
       <div className="mt-8 overflow-hidden rounded-2xl border border-line bg-white shadow-card">
         <table className="w-full text-left text-sm">
           <thead className="bg-cream text-xs uppercase tracking-wide text-slate-500">

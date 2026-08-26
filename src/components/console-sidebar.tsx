@@ -22,11 +22,11 @@ export function ConsoleSidebar() {
   const router = useRouter();
   const [resetting, setResetting] = useState(false);
 
-  async function resetDemo() {
-    if (!confirm("Reset the demo environment?\n\nAll triage changes will be discarded and the seeded estate restored.")) return;
+  async function wipeData() {
+    if (!confirm("Wipe ALL data from this environment?\n\nEvery resource, finding and event is deleted. Reconnect a cloud account via the agent to repopulate.")) return;
     setResetting(true);
     try {
-      const res = await fetch("/api/demo/reset", { method: "POST" });
+      const res = await fetch("/api/data", { method: "DELETE" });
       if (!res.ok) throw new Error();
       router.refresh();
     } finally {
@@ -60,13 +60,13 @@ export function ConsoleSidebar() {
       </nav>
       <div className="hidden border-t border-white/10 p-4 lg:block">
         <button
-          onClick={resetDemo}
+          onClick={wipeData}
           disabled={resetting}
           className="w-full rounded-lg border border-white/15 px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition hover:border-white/40 hover:text-white disabled:opacity-50"
         >
-          {resetting ? "Reseeding…" : "↺ Reset demo data"}
+          {resetting ? "Wiping…" : "⌫ Wipe all data"}
           <span className="mt-0.5 block text-[10px] font-normal leading-snug text-slate-500">
-            Restore the pristine seed. Break things freely.
+            Start clean. Reconnect via the agent.
           </span>
         </button>
       </div>
