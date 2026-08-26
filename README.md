@@ -101,6 +101,13 @@ npm run dev                   # marketing site at http://localhost:3000
 Need an instant free Postgres? [Supabase](https://supabase.com) or
 [Neon](https://neon.tech) — copy the connection string into `DATABASE_URL`.
 
+> **Deploying serverless?** Point `DATABASE_URL` at your provider's
+> **transaction** pooler (Supabase: port `6543`) with
+> `?pgbouncer=true&connection_limit=1&pool_timeout=20`. A session pooler
+> (port `5432`) dedicates a Postgres connection per client, so concurrent
+> function instances exhaust the database and the console starts returning
+> Prisma `P2024` pool timeouts. See `.env.example`.
+
 The first account you register owns the deployment.
 
 ### Upgrading a pre-workspace deployment
